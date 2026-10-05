@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "Безопасный маршрут — Цифровой навигатор",
+  "short_name": "Безопасный маршрут",
+  "description": "Интерактивный тренажёр безопасного поведения в цифровой среде",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1028",
+  "theme_color": "#0a1028",
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

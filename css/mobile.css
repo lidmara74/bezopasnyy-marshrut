@@ -1,0 +1,104 @@
+/* Phone layout for the hosted game. The desktop layout remains the original one. */
+@media (max-width: 600px) {
+  html { scroll-padding-top: 12px; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  .topbar {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    padding: max(8px, env(safe-area-inset-top)) 10px 9px;
+  }
+  .topbar .nav-button { grid-column: 1; grid-row: 1; width: 44px; height: 44px; }
+  .topbar .brand { grid-column: 2; grid-row: 1; min-width: 0; }
+  .topbar .brand span { font-size: 10px; letter-spacing: .08em; }
+  .topbar .brand b { font-size: 15px !important; margin-top: 2px; line-height: 1.15; }
+  .topbar .hud { grid-column: 3; grid-row: 1; margin: 0; }
+  .topbar .age-switch { min-height: 44px; padding: 5px 8px; font-size: 13px; line-height: 1.1; }
+  .topbar .age-switch small { font-size: 10px; margin-top: 2px; }
+  .topbar .level, .topbar .xp, .topbar .star-count { display: none; }
+  .topbar .top-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    width: 100%;
+    gap: 4px;
+    margin: 0;
+  }
+  .topbar .top-actions button {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 2px;
+    border-radius: 10px;
+  }
+  .topbar .top-actions .icon { width: 20px; height: 20px; }
+  .topbar .top-actions #sound span,
+  .topbar .top-actions #player span { display: none; }
+  .topbar .top-actions #finish-today { font-size: 0; }
+  .topbar .top-actions #finish-today::after { content: 'Выход'; font-size: 11px; font-weight: 700; }
+  .game-page { padding: 11px 10px 30px; }
+  .game-breadcrumb { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 5px; margin-bottom: 9px; }
+  .game-breadcrumb .text-button { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+  .game-breadcrumb > span { font-size: 12px; white-space: nowrap; }
+  .game-breadcrumb .secondary { min-width: 44px; min-height: 44px; font-size: 12px; padding: 5px; }
+  .game-grid { gap: 10px; }
+  .guide-panel {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 78px 44px;
+    gap: 5px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 15px;
+  }
+  .guide-avatar { grid-column: 1; grid-row: 1; width: 40px; height: 40px; }
+  .guide-avatar img { height: 82px; }
+  .guide-panel > b { grid-column: 2; grid-row: 1; font-size: 13px; }
+  .guide-panel #game-hint { grid-column: 3; grid-row: 1; min-height: 44px; font-size: 12px; padding: 4px; }
+  .guide-panel #game-bag { grid-column: 4; grid-row: 1; width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 0; justify-content: center; }
+  .guide-panel #game-bag .icon { width: 22px; height: 22px; }
+  .guide-panel #repeat-voice { grid-column: 1 / 3; grid-row: 2; min-width: 0; min-height: 44px; font-size: 12px; padding: 4px; justify-content: center; }
+  .guide-panel #listen-mode { grid-column: 3 / 5; grid-row: 2; width: 100%; min-height: 44px; font-size: 12px; padding: 4px; }
+  .play-panel { padding: 15px 12px; border-radius: 18px; }
+  .task-head h1 { font-size: 22px; line-height: 1.2; }
+  .route-story { margin: 10px 0; padding: 10px 12px; }
+  .route-story p, .situation p { font-size: 16px; line-height: 1.5; }
+  .task-head .eyebrow, .route-story > span, .situation > span { font-size: 12px; }
+  .device-content { padding: 12px; }
+  .device-action, .chat-reply, .drag-card, .hotspot, .permission-row, .vault-event { min-height: 48px; font-size: 14px; }
+  .device-tabs button { min-height: 48px; font-size: 14px; }
+  .map-page { padding: 13px 10px 30px; }
+  .map-banner { min-height: 178px; padding: 16px; }
+  .map-banner h1 { font-size: 26px; }
+  .map-banner p { font-size: 14px; }
+  .world-grid { grid-template-columns: 1fr; }
+  .world-cover { height: 185px; }
+  .world-info h3 { min-height: 0; font-size: 20px; }
+  .world-info p { min-height: 0; font-size: 14px; }
+  .world-tag, .card-bottom { font-size: 13px; }
+  .location { padding: 12px 10px 30px; }
+  .world-nav { gap: 4px; max-height: 108px; overflow-y: auto; }
+  .world-nav > [data-nav] { flex: 1 1 44%; min-height: 44px; font-size: 12px; }
+  .location-hero { min-height: 190px; }
+  .stage-grid { grid-template-columns: 1fr; }
+  .stage-card { padding: 16px; }
+  .stage-preview { height: 110px; }
+  .stage-card h3 { font-size: 18px; }
+  .stage-card p { min-height: 0; font-size: 14px; }
+  .stage-play { width: 100%; }
+  dialog { width: calc(100vw - 20px); max-height: calc(100dvh - 24px); padding: 18px 14px; }
+  #toast { bottom: max(12px, env(safe-area-inset-bottom)); width: calc(100vw - 24px); font-size: 14px; }
+}
+@media (max-width: 360px) {
+  .topbar .brand b { font-size: 13px !important; }
+  .topbar .age-switch { font-size: 11px; }
+  .topbar .age-switch small { font-size: 9px; }
+  .game-breadcrumb > span { display: none; }
+  .game-breadcrumb { grid-template-columns: minmax(0, 1fr) auto; }
+}
