@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Ядрешникова Олеся Витальевна">
+<meta name="copyright" content="© 2026 Ядрешникова Олеся Витальевна">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ИОМ-Навигатор v5.1 — сохранение карты и итоговой карточки</title>
+<style>
+:root{
+  --bg:#f4f7fb; --bg2:#edf4f7; --surface:#ffffff; --surface2:#f7f9fc; --surface3:#eef5f7;
+  --text:#17222d; --muted:#667587; --primary:#176b73; --primary2:#10545b; --primary3:#0d4147;
+  --accent:#dff3f1; --accent2:#eaf2fb; --violet:#6f65a8; --line:#dce5eb; --line-strong:#c9d6df;
+  --ok:#2c7661; --warn:#9a6b1f; --danger:#a34c59;
+  --shadow:0 18px 50px rgba(25,53,73,.08); --shadow-sm:0 8px 24px rgba(25,53,73,.07);
+  --radius:24px; --font:17px; --focus:0 0 0 4px rgba(23,107,115,.14);
+}
+*{box-sizing:border-box}
+html{font-size:var(--font);scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#f8fbfd 0%,var(--bg) 38%,#f6f8fb 100%);color:var(--text);line-height:1.55;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:
+ radial-gradient(circle at 8% 8%,rgba(63,156,163,.12),transparent 25rem),
+ radial-gradient(circle at 94% 18%,rgba(111,101,168,.08),transparent 28rem),
+ radial-gradient(circle at 50% 100%,rgba(56,121,164,.06),transparent 32rem)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit}.hidden{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.app{min-height:100vh}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(248,251,253,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(207,220,228,.8)}
+.topbar-inner{max-width:1380px;margin:auto;display:flex;align-items:center;gap:16px;padding:12px 22px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,#1b7a82,#155e67 65%,#174d67);color:white;display:grid;place-items:center;font-size:.78rem;font-weight:850;letter-spacing:.03em;box-shadow:0 10px 24px rgba(23,107,115,.22);position:relative;overflow:hidden}
+.logo:after{content:"";position:absolute;width:34px;height:34px;border:1px solid rgba(255,255,255,.18);border-radius:50%;right:-13px;top:-11px}
+.brand h1{font-size:1.04rem;margin:0;line-height:1.15;letter-spacing:-.01em}.brand small{color:var(--muted);font-size:.8rem}.top-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.icon-btn,.btn{border:1px solid var(--line);background:rgba(255,255,255,.92);border-radius:13px;padding:10px 14px;color:var(--text);transition:.18s ease;box-shadow:0 1px 0 rgba(255,255,255,.8) inset}
+.icon-btn:hover,.btn:hover{transform:translateY(-1px);border-color:#b9cbd4;background:white;box-shadow:var(--shadow-sm)}
+.icon-btn:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;box-shadow:var(--focus)}
+.btn.primary{background:linear-gradient(135deg,var(--primary),#1d7e87);color:white;border-color:transparent;box-shadow:0 10px 24px rgba(23,107,115,.2)}.btn.primary:hover{background:linear-gradient(135deg,var(--primary2),#176b73)}
+.btn.soft{background:var(--accent);border-color:#c8e4e0;color:var(--primary3)}.btn.danger{color:var(--danger)}.btn.large{padding:14px 20px;font-weight:780;min-height:52px}
+.container{max-width:1380px;margin:auto;padding:30px 22px 58px}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:20px;align-items:stretch}
+.hero-card,.panel,.step-card,.result-card{background:rgba(255,255,255,.94);border:1px solid rgba(214,226,233,.9);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-main{padding:44px 46px;position:relative;overflow:hidden;isolation:isolate}
+.hero-main:before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;right:-120px;top:-135px;background:linear-gradient(145deg,rgba(29,126,135,.14),rgba(111,101,168,.08));z-index:-1}
+.hero-main:after{content:"";position:absolute;width:150px;height:150px;border:34px solid rgba(23,107,115,.035);border-radius:50%;right:35px;bottom:-95px;z-index:-1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.81rem;font-weight:800;color:var(--primary2);background:var(--accent);border:1px solid #cbe8e4;border-radius:999px;padding:7px 11px;letter-spacing:.015em}
+.hero h2{font-size:clamp(2.35rem,4.2vw,4.25rem);letter-spacing:-.045em;line-height:.98;margin:22px 0 18px;max-width:760px}.hero h2 .accent-word{color:var(--primary)}
+.hero-lead{font-size:1.09rem;color:#566779;max-width:820px;margin:0}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.hero-trust{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.trust-pill{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:#536575;background:rgba(247,250,252,.9);border:1px solid var(--line);padding:8px 10px;border-radius:999px}.trust-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(44,118,97,.08)}
+.notice{margin-top:20px;border:1px solid #cfe7e4;background:linear-gradient(135deg,#eef9f7,#f8fbfc);padding:14px 16px;border-radius:15px;color:#335e62;display:flex;gap:10px;align-items:flex-start}.notice:before{content:"→";width:28px;height:28px;border-radius:9px;background:white;display:grid;place-items:center;flex:0 0 auto;font-weight:900;color:var(--primary);box-shadow:0 4px 12px rgba(23,107,115,.08)}
+
+.hero-side{padding:26px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(160deg,#163f46 0%,#155b63 54%,#1a566c 100%);color:white;border-color:transparent;position:relative;overflow:hidden}
+.hero-side:before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid rgba(255,255,255,.09);right:-100px;top:-80px;box-shadow:0 0 0 28px rgba(255,255,255,.025),0 0 0 58px rgba(255,255,255,.02)}
+.hero-side h3{margin:0;font-size:1.15rem;position:relative}.hero-side .side-kicker{font-size:.78rem;color:rgba(255,255,255,.62);text-transform:uppercase;letter-spacing:.11em;font-weight:750;margin-bottom:8px}
+.flow-mini{display:grid;gap:10px;margin:20px 0;position:relative}.flow-mini:before{content:"";position:absolute;left:18px;top:23px;bottom:23px;width:1px;background:rgba(255,255,255,.18)}
+.flow-mini div{display:flex;align-items:center;gap:12px;padding:12px 13px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.095);border-radius:14px;backdrop-filter:blur(6px);position:relative}.flow-mini b{min-width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.98);display:grid;place-items:center;color:var(--primary2);border:0;box-shadow:0 6px 16px rgba(0,0,0,.13)}.flow-mini span{font-size:.91rem;line-height:1.35;color:rgba(255,255,255,.92)}
+.side-footer{font-size:.82rem;color:rgba(255,255,255,.64);border-top:1px solid rgba(255,255,255,.12);padding-top:14px;position:relative}
+
+.section-label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800;margin:28px 0 10px 4px}
+.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:0}.quick-card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:19px;padding:20px;text-align:left;transition:.2s ease;position:relative;overflow:hidden;min-height:148px}.quick-card:after{content:"→";position:absolute;right:17px;bottom:16px;width:32px;height:32px;border-radius:10px;background:var(--surface3);display:grid;place-items:center;color:var(--primary);font-weight:900;transition:.2s}.quick-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#bfd3db}.quick-card:hover:after{transform:translateX(2px);background:var(--accent)}.quick-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#e6f6f4,#edf4fb);color:var(--primary2);font-weight:850;margin-bottom:17px;border:1px solid #d5e9e7}.quick-card strong{display:block;margin-bottom:6px;font-size:1rem}.quick-card span{font-size:.87rem;color:var(--muted);display:block;max-width:88%;line-height:1.45}
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.principle{border:1px solid var(--line);background:rgba(250,252,253,.82);border-radius:17px;padding:15px 16px;display:flex;gap:12px;align-items:flex-start}.principle-icon{min-width:33px;height:33px;border-radius:10px;background:white;border:1px solid var(--line);display:grid;place-items:center;color:var(--primary);font-weight:900}.principle b{display:block;font-size:.9rem;margin-bottom:2px}.principle small{display:block;color:var(--muted);font-size:.8rem;line-height:1.4}
+
+.workspace{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:start}.sidebar{position:sticky;top:84px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow-sm)}
+.progress-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.progress-head b{font-size:.92rem}.progress-head span{font-size:.79rem;color:var(--muted);background:var(--surface2);padding:4px 8px;border-radius:999px}.progress-track{height:8px;background:#eaf0f3;border-radius:999px;overflow:hidden;margin-bottom:16px}.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),#36a0a2);width:10%;transition:.28s cubic-bezier(.2,.8,.2,1);border-radius:999px}
+.step-nav{display:grid;gap:5px}.step-nav button{border:0;background:transparent;text-align:left;padding:10px 10px 10px 43px;border-radius:12px;color:var(--muted);position:relative;min-height:43px;line-height:1.25;transition:.16s}.step-nav button:before{content:attr(data-step);position:absolute;left:9px;top:9px;width:25px;height:25px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font-size:.72rem;font-weight:800;color:#80909f}.step-nav button:hover{background:#f7fafb;color:var(--text)}.step-nav button.active{background:linear-gradient(135deg,var(--accent),#edf7f8);color:var(--primary3);font-weight:750}.step-nav button.active:before{background:var(--primary);border-color:var(--primary);color:white}.step-nav button.done{color:#547467}.step-nav button.done:before{content:"✓";background:#e7f5ef;border-color:#c9e5d8;color:var(--ok)}
+.main-step{min-width:0}.step-card{padding:30px 32px;border-radius:22px;min-height:620px}.step-title{display:flex;gap:14px;align-items:flex-start;margin-bottom:23px;padding-bottom:20px;border-bottom:1px solid #edf1f4}.step-num{min-width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,var(--accent),#e9f5f5);display:grid;place-items:center;font-weight:850;color:var(--primary);border:1px solid #cfe6e3;box-shadow:0 7px 18px rgba(23,107,115,.08)}.step-title h2{margin:0 0 5px;font-size:1.62rem;letter-spacing:-.02em}.step-title p{margin:0;color:var(--muted);max-width:820px}
+.field{margin:18px 0}label.field-label{display:block;font-weight:760;margin-bottom:8px;font-size:.93rem}.hint{color:var(--muted);font-size:.84rem;margin-top:7px}input[type=text],select,textarea{width:100%;border:1px solid var(--line-strong);background:#fff;border-radius:13px;padding:12px 13px;color:var(--text);outline:none;transition:.16s}input[type=text]:hover,select:hover,textarea:hover{border-color:#afc2cc}input[type=text]:focus,select:focus,textarea:focus{border-color:#68a5aa;box-shadow:var(--focus)}textarea{min-height:112px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.options{display:grid;gap:9px}.option{display:flex;align-items:flex-start;gap:11px;border:1px solid var(--line);padding:12px 13px;border-radius:13px;background:#fff;transition:.15s}.option:hover{background:#f9fcfc;border-color:#c6d9df;transform:translateX(1px)}.option input{margin-top:3px;transform:scale(1.08);accent-color:var(--primary);width:17px;height:17px}.option strong{display:block}.option small{color:var(--muted)}.option.compact{padding:9px 10px}.radio-row{display:flex;gap:8px;flex-wrap:wrap}.radio-pill{position:relative}.radio-pill input{position:absolute;opacity:0;pointer-events:none}.radio-pill span{display:inline-block;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;transition:.15s}.radio-pill span:hover{border-color:#b7cbd3;background:#fbfdfd}.radio-pill input:checked+span{background:var(--accent);border-color:#9bc9c7;color:var(--primary3);font-weight:760;box-shadow:0 4px 12px rgba(23,107,115,.07)}
+.section-box{border:1px solid var(--line);border-radius:17px;padding:17px;margin:15px 0;background:linear-gradient(180deg,#fff,#fbfcfd)}.section-box h3{margin:0 0 12px;font-size:1.02rem}.alert{padding:14px 15px;border-radius:13px;background:#fff8e9;border:1px solid #eed9ab;color:#6e5426;margin:15px 0}.alert.info{background:#eff7fb;border-color:#cce2ed;color:#315b70}.alert.ok{background:#eef8f4;border-color:#c8e6da;color:#2d6553}.nav-actions{display:flex;justify-content:space-between;gap:10px;margin-top:26px;padding-top:20px;border-top:1px solid #edf1f4}
+.sequence{display:grid;gap:10px}.seq-item{display:flex;align-items:center;gap:9px}.seq-number{width:36px;height:36px;border-radius:11px;background:var(--surface3);display:grid;place-items:center;font-weight:850;color:var(--primary);border:1px solid #d8e8e8}.seq-item input{flex:1}.seq-item button{border:1px solid var(--line);background:white;border-radius:10px;padding:8px 10px}.support-scale{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.support-scale label{position:relative}.support-scale input{position:absolute;opacity:0}.support-scale span{display:flex;align-items:center;justify-content:center;text-align:center;min-height:86px;padding:10px;border:1px solid var(--line);border-radius:14px;background:white;font-size:.84rem;transition:.15s}.support-scale span:hover{border-color:#b9ced6;transform:translateY(-1px)}.support-scale input:checked+span{background:linear-gradient(145deg,var(--accent),#eef7fa);border-color:#91c4c3;color:var(--primary3);font-weight:760;box-shadow:0 7px 18px rgba(23,107,115,.08)}
+
+.result-card{padding:32px}.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.result-item{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:#fff}.result-item b{display:block;color:var(--primary2);font-size:.82rem;margin-bottom:5px;text-transform:uppercase;letter-spacing:.035em}.result-item span{white-space:pre-wrap}.result-wide{grid-column:1/-1}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0 22px}.saved-list{display:grid;gap:10px}.saved-cycle{border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;background:white}.saved-cycle .meta{flex:1}.saved-cycle small{color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(16,31,43,.5);backdrop-filter:blur(5px);z-index:80;display:grid;place-items:center;padding:18px}.modal-card{width:min(920px,96vw);max-height:88vh;overflow:auto;background:#fff;border-radius:22px;border:1px solid var(--line);box-shadow:0 30px 90px rgba(0,0,0,.22);padding:25px}.modal-head{display:flex;justify-content:space-between;gap:16px;align-items:center;position:sticky;top:-25px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:8px 0 15px;z-index:2}.modal-head h2{margin:0}.close{border:1px solid var(--line);background:var(--surface2);border-radius:11px;width:39px;height:39px}.tour-slide{display:none}.tour-slide.active{display:block}.tour-art{height:190px;border-radius:18px;background:linear-gradient(135deg,#eaf6f5,#eef3fb);display:grid;place-items:center;margin:12px 0 20px;border:1px solid var(--line)}.tour-art .diagram{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}.tour-art .diagram span{background:white;border:1px solid var(--line);padding:12px 14px;border-radius:12px;box-shadow:0 8px 18px rgba(35,74,96,.06)}.library-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.case{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(180deg,#fff,#fbfcfd)}.case h3{margin-top:0}.tag{display:inline-block;font-size:.76rem;border-radius:999px;background:var(--surface3);padding:5px 9px;margin:2px 2px 2px 0;color:#55707b}.glossary details{border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:8px 0;background:#fff}.glossary summary{cursor:pointer;font-weight:750}.glossary p{margin:8px 0 0;color:#425367}.footer-note{margin-top:23px;color:var(--muted);font-size:.82rem;text-align:center}.mobile-progress{display:none;margin-bottom:14px;background:white;border:1px solid var(--line);border-radius:14px;padding:12px}.bottom-next{display:none}
+
+
+/* ===== v3: professional workspace, route map, contextual guidance ===== */
+.iom-route{display:flex;align-items:stretch;gap:7px;margin:0 0 20px;overflow-x:auto;padding:2px 1px 8px;scrollbar-width:thin}
+.iom-route-node{min-width:118px;flex:1;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 11px;position:relative;transition:.18s}
+.iom-route-node:not(:last-child):after{content:"›";position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:17px;height:17px;border-radius:50%;background:var(--bg);display:grid;place-items:center;color:#8a9aa7;font-weight:900;z-index:2}
+.iom-route-node small{display:block;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}.iom-route-node b{display:block;font-size:.82rem;line-height:1.25}.iom-route-node.active{border-color:#83b9bb;background:linear-gradient(145deg,#e8f7f5,#f7fbfb);box-shadow:0 8px 18px rgba(23,107,115,.08)}.iom-route-node.done{background:#f1f8f5;border-color:#d5e9df}.iom-route-node.done small{color:var(--ok)}
+.route-summary{margin:4px 0 24px;padding:18px;border:1px solid #cfe4e3;background:linear-gradient(135deg,#f3fbfa,#f8fbfd);border-radius:18px}.route-summary h3{margin:0 0 12px}.route-values{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.route-value{background:white;border:1px solid var(--line);border-radius:13px;padding:11px}.route-value small{display:block;color:var(--muted);font-size:.72rem;margin-bottom:3px}.route-value b{font-size:.86rem;line-height:1.35;display:block}
+.tip-card{border:1px solid #cbdfe9;background:linear-gradient(135deg,#f3f8fd,#f7fbfb);border-radius:16px;padding:15px 16px;margin:16px 0;position:relative;overflow:hidden}.tip-card:before{content:"✦";position:absolute;right:15px;top:10px;color:#7c9fb1;font-size:1.25rem}.tip-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#5f8192;font-weight:850;margin-bottom:5px}.tip-card h3{margin:0 34px 5px 0;font-size:1rem}.tip-card p{margin:0;color:#425d6c;font-size:.9rem}.tip-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tip-actions .btn{padding:8px 11px;font-size:.82rem}.tip-confirm{margin-top:9px;color:var(--ok);font-size:.82rem;font-weight:700}
+.reason-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.reason-group{border:1px solid var(--line);border-radius:15px;padding:14px;background:linear-gradient(180deg,#fff,#fbfcfd)}.reason-group-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}.reason-icon{width:34px;height:34px;border-radius:10px;background:var(--surface3);display:grid;place-items:center;color:var(--primary);font-weight:850;flex:0 0 auto}.reason-group h4{margin:0;font-size:.92rem}.reason-group p{margin:1px 0 0;color:var(--muted);font-size:.76rem;line-height:1.35}.reason-group .options{gap:7px}.reason-group .option{padding:9px 10px;font-size:.87rem}
+.dashboard-top{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 16px}.stat-card{border:1px solid var(--line);border-radius:14px;padding:13px;background:linear-gradient(145deg,#fff,#f8fbfc)}.stat-card strong{display:block;font-size:1.45rem;color:var(--primary2);line-height:1}.stat-card span{font-size:.78rem;color:var(--muted)}.dashboard-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.dashboard-tools input,.library-filters input,.library-filters select{width:auto;flex:1;min-width:150px}.saved-cycle{transition:.16s}.saved-cycle:hover{border-color:#bfd3db;box-shadow:var(--shadow-sm)}.cycle-badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:.7rem;font-weight:800;background:#e9f6f0;color:var(--ok);margin-left:6px}.cycle-actions{display:flex;gap:6px;flex-wrap:wrap}.cycle-actions .btn{padding:8px 10px;font-size:.8rem}
+.library-filters{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:8px;margin:13px 0 16px}.library-empty{grid-column:1/-1}.case{display:flex;flex-direction:column}.case p{font-size:.88rem;color:#475b69}.case .case-structure{display:grid;gap:6px;margin:8px 0 12px}.case-line{font-size:.82rem;border-left:3px solid #d9e8eb;padding-left:9px;color:#4a5f6b}.case-line b{color:var(--primary2)}.case .btn{margin-top:auto;align-self:flex-start}
+.result-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-bottom:18px}.result-hero-main{border:1px solid #cfe3e1;border-radius:18px;padding:20px;background:linear-gradient(135deg,#eaf8f5,#f7fbfc)}.result-hero-main small{color:var(--primary2);font-weight:800;text-transform:uppercase;letter-spacing:.07em}.result-hero-main h3{margin:7px 0 4px;font-size:1.3rem}.result-hero-main p{margin:0;color:var(--muted)}.result-hero-side{border:1px solid var(--line);border-radius:18px;padding:18px;background:#fff;display:grid;gap:9px}.result-hero-side div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:7px}.result-hero-side div:last-child{border:0;padding-bottom:0}.result-hero-side span{color:var(--muted);font-size:.78rem}.result-hero-side b{font-size:.84rem;text-align:right}.result-sections{display:grid;gap:14px}.result-section{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:#fff}.result-section-head{padding:13px 15px;background:linear-gradient(90deg,#f3f8f9,#fbfcfd);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}.result-section-icon{width:31px;height:31px;border-radius:10px;background:white;border:1px solid var(--line);display:grid;place-items:center;color:var(--primary);font-weight:900}.result-section-head h3{margin:0;font-size:.96rem}.result-section-body{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;padding:5px 15px 12px}.result-section .result-item{border:0;border-bottom:1px dashed var(--line);border-radius:0;padding:11px 0;background:transparent;box-shadow:none}.result-section .result-wide{grid-column:1/-1}.backup-note{font-size:.78rem;color:var(--muted);margin-top:6px}.import-input{display:none}
+.toast{position:fixed;right:18px;bottom:18px;z-index:120;max-width:360px;background:#173d43;color:white;border-radius:14px;padding:12px 14px;box-shadow:0 18px 50px rgba(0,0,0,.22);font-size:.86rem;opacity:0;transform:translateY(8px);pointer-events:none;transition:.22s}.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:900px){.route-values{grid-template-columns:1fr 1fr}.library-filters{grid-template-columns:1fr 1fr}.result-hero{grid-template-columns:1fr}.reason-groups{grid-template-columns:1fr}.dashboard-top{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:680px){.iom-route-node{min-width:105px}.route-values,.library-filters,.dashboard-top{grid-template-columns:1fr}.result-section-body{grid-template-columns:1fr}.result-section .result-wide{grid-column:auto}.dashboard-tools{display:grid}.dashboard-tools .btn,.dashboard-tools input{width:100%}.cycle-actions{width:100%}}
+
+@media(max-width:1050px){.hero{grid-template-columns:1fr}.quick-grid{grid-template-columns:repeat(2,1fr)}.workspace{grid-template-columns:1fr}.sidebar{display:none}.mobile-progress{display:block}.support-scale{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.container{padding:16px 12px 88px}.topbar-inner{padding:10px 12px}.brand small{display:none}.top-actions .label{display:none}.icon-btn{padding:9px 10px}.hero-main{padding:27px 22px}.hero-side{padding:22px}.hero h2{font-size:2.35rem}.hero-lead{font-size:1rem}.hero-actions{display:grid}.hero-actions .btn{width:100%}.hero-trust{display:grid}.quick-grid,.principles{grid-template-columns:1fr}.quick-card{min-height:126px}.two,.three,.result-grid,.library-grid{grid-template-columns:1fr}.result-wide{grid-column:auto}.step-card{padding:19px 16px;min-height:0}.step-title{padding-bottom:16px}.step-title h2{font-size:1.35rem}.radio-row{display:grid;grid-template-columns:1fr 1fr}.radio-pill span{display:block;text-align:center}.support-scale{grid-template-columns:1fr 1fr}.nav-actions .next-desktop{display:none}.bottom-next{display:block;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 12px;z-index:50}.bottom-next .btn{width:100%;padding:14px;font-weight:800}.modal-card{padding:20px 16px}.modal-head{top:-20px}.saved-cycle{align-items:flex-start;flex-wrap:wrap}}
+@media print{body{background:white}.topbar,.sidebar,.mobile-progress,.nav-actions,.bottom-next,.toolbar,.footer-note{display:none!important}.container{padding:0}.workspace{display:block}.step-card{border:0;box-shadow:none;padding:0}.result-card{box-shadow:none;border:0;padding:0}.result-item{break-inside:avoid}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* ===== v4: visual & interactive UX ===== */
+.iom-route{position:relative;gap:10px;padding:4px 2px 12px}.iom-route:before{content:"";position:absolute;left:5%;right:5%;top:33px;height:2px;background:linear-gradient(90deg,#dce8ec,#cfe3e3);z-index:0}.iom-route-node{z-index:1;min-width:135px;padding:12px 12px 11px;cursor:pointer;overflow:hidden}.iom-route-node:before{content:"";display:block;width:13px;height:13px;border-radius:50%;background:#dbe6ea;border:3px solid #fff;box-shadow:0 0 0 1px #cad9df;margin-bottom:8px}.iom-route-node.active:before{background:var(--primary);box-shadow:0 0 0 4px rgba(23,107,115,.12)}.iom-route-node.done:before{background:var(--ok)}.iom-route-node:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}.iom-route-node .route-preview{display:block;margin-top:5px;font-size:.7rem;color:#758492;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}.iom-route-node:not(:last-child):after{display:none}
+
+.reason-groups{align-items:start}.reason-group{padding:0;overflow:hidden;background:white;transition:.2s ease}.reason-group[open]{box-shadow:0 10px 28px rgba(25,53,73,.07);border-color:#bfd5dd}.reason-group summary{list-style:none;cursor:pointer;padding:15px;display:flex;gap:11px;align-items:flex-start;background:linear-gradient(180deg,#fff,#fbfdfe)}.reason-group summary::-webkit-details-marker{display:none}.reason-group summary:after{content:"+";margin-left:auto;width:29px;height:29px;border-radius:9px;background:var(--surface3);display:grid;place-items:center;color:var(--primary);font-weight:900}.reason-group[open] summary:after{content:"−"}.reason-group .reason-body{padding:0 14px 14px}.reason-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--accent);color:var(--primary2);font-size:.73rem;font-weight:800;margin-left:6px}.reason-group.selected{border-color:#8fc1c2}.reason-group.selected summary{background:linear-gradient(135deg,#eef9f7,#f7fbfc)}
+
+.need-visual-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 16px}.need-visual-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:13px;min-height:96px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:.18s}.need-visual-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);border-color:#bad1da}.need-visual-card.selected{background:linear-gradient(145deg,#eaf8f6,#f8fbfc);border-color:#8fc3c2;box-shadow:0 8px 22px rgba(23,107,115,.07)}.need-visual-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--surface3);color:var(--primary2);font-weight:900;flex:0 0 auto}.need-visual-card b{font-size:.88rem;line-height:1.28}.need-visual-card small{display:block;color:var(--muted);font-size:.74rem;margin-top:4px;line-height:1.3}.need-visual-card input{position:absolute;opacity:0;pointer-events:none}
+
+.sequence{gap:0}.seq-card{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:16px;padding:11px 12px;box-shadow:0 5px 18px rgba(25,53,73,.045);position:relative;transition:.18s}.seq-card.dragging{opacity:.48;transform:scale(.99)}.seq-card.drag-over{border-color:#6caeb1;box-shadow:0 0 0 4px rgba(23,107,115,.10)}.seq-connector{height:22px;width:2px;background:linear-gradient(var(--primary),#b9d7d7);margin:0 auto;position:relative}.seq-connector:after{content:"⌄";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);color:var(--primary);font-weight:900;font-size:.85rem}.drag-handle{width:32px;height:38px;border:0;background:transparent;color:#8a9aa7;font-weight:900;cursor:grab;font-size:1.05rem}.drag-handle:active{cursor:grabbing}.seq-number{margin:0}.seq-actions{display:flex;gap:5px}.seq-actions button{width:32px;height:32px;padding:0;display:grid;place-items:center}.sequence-hint{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:.8rem;margin:9px 0 12px}.sequence-hint:before{content:"↕";width:26px;height:26px;border-radius:8px;background:var(--surface3);display:grid;place-items:center;color:var(--primary);font-weight:900}
+
+.support-path{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:18px 0 8px;padding-top:6px}.support-path:before{content:"";position:absolute;left:7%;right:7%;top:35px;height:4px;background:linear-gradient(90deg,#b8d6d5,#d8e5e8);border-radius:999px}.support-node{position:relative;z-index:1}.support-node input{position:absolute;opacity:0}.support-node span{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;cursor:pointer;color:var(--muted);font-size:.78rem;line-height:1.25}.support-dot{width:46px;height:46px!important;min-height:46px!important;border-radius:50%!important;padding:0!important;background:#fff!important;border:4px solid #dbe7ea!important;box-shadow:0 0 0 4px #fff!important;font-weight:900!important;color:#7d8d98!important}.support-node input:checked+span .support-dot{background:var(--primary)!important;border-color:#8fc5c5!important;color:#fff!important;box-shadow:0 0 0 5px rgba(23,107,115,.11)!important;transform:scale(1.07)}.support-node input:checked+span{color:var(--primary3);font-weight:800}.support-readout{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.support-readout>div{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--surface2)}.support-readout small{display:block;color:var(--muted);margin-bottom:3px}.support-readout b{font-size:.92rem}.support-next-note{color:var(--muted);font-size:.76rem;margin-top:4px}
+
+.plan-fact{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 18px}.plan-fact-card{border:1px solid var(--line);border-radius:17px;padding:15px;background:#fff;position:relative;overflow:hidden}.plan-fact-card.plan{background:linear-gradient(145deg,#f4f9fb,#fff)}.plan-fact-card.fact{background:linear-gradient(145deg,#f0faf6,#fff)}.plan-fact-card .pf-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:850}.plan-fact-card h3{margin:5px 0 10px;font-size:1rem}.pf-list{display:grid;gap:7px}.pf-item{display:flex;gap:8px;align-items:flex-start;font-size:.83rem;color:#465968}.pf-item:before{content:"•";color:var(--primary);font-weight:900}.fact-pulse{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;color:var(--ok);font-weight:800}.fact-pulse:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(44,118,97,.09)}
+
+.cycle-history{margin:18px 0;border:1px solid var(--line);border-radius:18px;padding:16px;background:linear-gradient(180deg,#fbfdfe,#fff)}.cycle-history-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:13px}.cycle-history-head h3{margin:0;font-size:1rem}.history-lanes{display:grid;gap:14px}.history-lane{border:1px solid var(--line);border-radius:15px;padding:13px;background:#fff}.history-lane-title{font-weight:800;font-size:.88rem;margin-bottom:10px}.history-track{display:flex;align-items:stretch;gap:9px;overflow-x:auto;padding:2px 2px 8px}.history-node{min-width:180px;max-width:240px;border:1px solid var(--line);border-radius:13px;padding:11px;background:var(--surface2);position:relative}.history-node:not(:last-child):after{content:"→";position:absolute;right:-17px;top:50%;transform:translateY(-50%);color:#8aa0a9;font-weight:900;z-index:2}.history-node small{display:block;color:var(--muted);font-size:.7rem}.history-node b{display:block;font-size:.82rem;margin:3px 0}.history-node p{font-size:.75rem;color:#526473;margin:5px 0 0;line-height:1.35}.history-node.current{border-color:#8fc3c2;background:#eef9f7}.history-empty{color:var(--muted);font-size:.86rem}
+
+.visual-callout{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;border:1px solid #d3e5e9;border-radius:16px;padding:14px;background:linear-gradient(135deg,#f5fbfc,#fff);margin:12px 0}.visual-callout-icon{width:38px;height:38px;border-radius:12px;background:var(--accent);display:grid;place-items:center;color:var(--primary);font-weight:900}.visual-callout h4{margin:0 0 3px}.visual-callout p{margin:0;color:var(--muted);font-size:.84rem}
+
+@media(max-width:1050px){.need-visual-grid{grid-template-columns:repeat(2,1fr)}.support-path{grid-template-columns:repeat(3,1fr)}.support-path:before{display:none}}
+@media(max-width:680px){.need-visual-grid,.plan-fact,.support-readout{grid-template-columns:1fr}.support-path{grid-template-columns:1fr 1fr}.seq-card{grid-template-columns:auto 1fr auto}.drag-handle{display:none}.seq-number{display:none}.history-node{min-width:165px}.iom-route-node{min-width:122px}}
+
+
+
+/* v4.1 — режим повышенной читаемости */
+:root{--muted:#465564;--line:#d4dfe6;--line-strong:#bccbd5}
+body{line-height:1.62;color:#14202b}
+.brand h1{font-size:1.12rem}.brand small{font-size:.91rem;color:#4d5d6a}
+.icon-btn,.btn{font-size:.96rem;min-height:43px}
+.hero-lead{font-size:1.13rem;color:#3f5262;line-height:1.62}
+.hero-trust .trust-pill{font-size:.9rem;color:#425562}
+.side-footer{font-size:.9rem;color:rgba(255,255,255,.84)}
+.section-label{font-size:.9rem;color:#455563;text-transform:none;letter-spacing:.025em}
+.quick-card strong{font-size:1.05rem}.quick-card span{font-size:.95rem;color:#465766;line-height:1.55}
+.principle b{font-size:.98rem}.principle small{font-size:.91rem;color:#485967;line-height:1.5}
+.progress-head b{font-size:1rem}.progress-head span{font-size:.9rem;color:#3f505d}
+.step-nav button{font-size:.96rem;color:#43525f;line-height:1.35;min-height:48px}
+.step-nav button:before{font-size:.82rem;color:#566673}
+.step-title h2{font-size:1.7rem;line-height:1.25}.step-title p{font-size:1rem;color:#435462;line-height:1.55}
+label.field-label{font-size:1rem}.hint{font-size:.94rem;color:#4b5b68;line-height:1.5}
+input[type=text],select,textarea{font-size:1rem;padding:14px 14px;line-height:1.5}
+.options{gap:10px}.option{padding:13px 14px;font-size:.98rem;line-height:1.45}.option input{width:20px;height:20px;transform:none}.option small{font-size:.9rem;color:#465865}
+.radio-pill span{font-size:.96rem;padding:11px 15px}
+.section-box h3{font-size:1.1rem}.alert{font-size:.97rem;line-height:1.55}
+.iom-route-node{min-width:150px;padding:13px}.iom-route-node small{font-size:.79rem;text-transform:none;letter-spacing:.01em;color:#52616e}.iom-route-node b{font-size:.94rem}.iom-route-node .route-preview{font-size:.82rem;color:#526370;max-width:190px}
+.tip-kicker{font-size:.84rem;text-transform:none;letter-spacing:.02em;color:#47697a}.tip-card h3{font-size:1.08rem}.tip-card p{font-size:.97rem;color:#354e5d;line-height:1.55}.tip-actions .btn{font-size:.93rem;padding:9px 12px}.tip-confirm{font-size:.91rem}
+.need-visual-card{min-height:112px;padding:15px}.need-visual-card b{font-size:.98rem;line-height:1.35}.need-visual-card small{font-size:.88rem;color:#475966;line-height:1.45}
+.reason-group h4{font-size:1rem}.reason-group p{font-size:.88rem;color:#495b68;line-height:1.45}.reason-count{font-size:.82rem}.reason-group .option{font-size:.95rem;padding:11px 12px}
+.sequence-hint{font-size:.92rem;color:#465865;line-height:1.45}.seq-card{padding:13px 14px}.seq-number{font-size:.95rem}.drag-handle{color:#657782}.seq-actions button{font-size:1rem}
+.support-node span{font-size:.88rem;color:#485965;line-height:1.35}.support-readout small{font-size:.9rem;color:#465865}.support-readout b{font-size:1rem}.support-next-note{font-size:.88rem;color:#465865;line-height:1.45}
+.plan-fact-card .pf-kicker{font-size:.84rem;text-transform:none;letter-spacing:.02em}.pf-item{font-size:.94rem;color:#405360}.fact-pulse{font-size:.86rem}
+.result-item b{font-size:.9rem;text-transform:none;letter-spacing:.01em}.result-item span{font-size:1rem;line-height:1.55}
+.history-node small{font-size:.81rem;color:#4d5d69}.history-node b{font-size:.92rem}.history-node p{font-size:.86rem;color:#455764;line-height:1.45}.history-empty{font-size:.95rem;color:#4a5b67}
+.visual-callout p{font-size:.94rem;color:#3f5260;line-height:1.5}
+.footer-note{font-size:.92rem;color:#4b5b67}
+
+/* Подсказки для конструктора способа действия */
+.action-helper{margin:0 0 18px;border:1px solid #c9dde3;border-radius:19px;background:linear-gradient(145deg,#f4fbfb,#f8fbfd);padding:18px}
+.action-helper-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:13px}
+.action-helper-icon{width:42px;height:42px;border-radius:13px;background:#fff;border:1px solid #cfe1e5;display:grid;place-items:center;color:var(--primary);font-weight:900;font-size:1.08rem;flex:0 0 auto}
+.action-helper h3{margin:0 0 4px;font-size:1.12rem}.action-helper p{margin:0;color:#3f5260;font-size:.96rem;line-height:1.52}
+.action-rule-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:13px 0}
+.action-rule{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 12px;font-size:.91rem;line-height:1.42;color:#344754}.action-rule b{display:block;color:var(--primary3);margin-bottom:2px}
+.action-example{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.action-example>div{border-radius:13px;padding:11px 12px;font-size:.92rem;line-height:1.45}.action-example .better{background:#edf8f3;border:1px solid #c8e4d7;color:#285b4d}.action-example .avoid{background:#fff7ed;border:1px solid #ead6b8;color:#6a532f}.action-example b{display:block;margin-bottom:3px}
+.action-suggestions-title{font-weight:800;margin:15px 0 8px}.action-suggestions{display:flex;gap:8px;flex-wrap:wrap}.action-suggestion{border:1px solid #b9d2d8;background:#fff;color:#244b55;border-radius:999px;padding:10px 13px;font-size:.94rem;font-weight:650;transition:.16s}.action-suggestion:hover{background:var(--accent);border-color:#86b8b9;transform:translateY(-1px)}.action-suggestion:before{content:"+";margin-right:7px;font-weight:900;color:var(--primary)}
+.action-helper-note{font-size:.88rem;color:#4a5c68;margin-top:10px;line-height:1.45}
+
+@media(max-width:850px){.action-rule-grid{grid-template-columns:1fr}.action-example{grid-template-columns:1fr}}
+@media(max-width:680px){
+ body{line-height:1.58}.container{padding-left:14px;padding-right:14px}.step-card{padding:20px 16px}.step-title h2{font-size:1.45rem}.step-title p{font-size:.98rem}
+ .iom-route-node{min-width:145px}.need-visual-card{min-height:auto}.action-helper{padding:15px}.action-suggestion{width:100%;text-align:left;border-radius:13px}
+}
+
+
+
+/* ===== v4.2 — фокус, читаемость и прогрессивное раскрытие ===== */
+:root{--font:18px;--muted:#354552;--line:#cfdbe3;--line-strong:#aebfca}
+body{color:#111c26;line-height:1.64}
+.step-card{max-width:1040px;margin:0 auto;padding:34px 36px}
+.step-title{margin-bottom:20px}.step-title h2{font-size:1.82rem;line-height:1.2;color:#10202b}.step-title p{font-size:1.03rem;color:#314553;max-width:850px}
+label.field-label{font-size:1.05rem;color:#152834}.hint{font-size:.97rem;color:#3a4e5b}
+.option{font-size:1rem;color:#172a35;min-height:50px;align-items:center}.option input{flex:0 0 auto}
+.radio-pill span{font-size:1rem;min-height:46px;display:inline-flex;align-items:center;justify-content:center}
+.alert{font-size:1rem}.alert.info{color:#244d60}.alert.ok{color:#245c4b}
+.step-nav button{font-size:.99rem;color:#31434f}.progress-head span{color:#2f424e}
+.iom-route-node small{font-size:.82rem;color:#3c4e5a}.iom-route-node b{font-size:.97rem}.iom-route-node .route-preview{font-size:.86rem;color:#465a67}
+.need-visual-card b{font-size:1rem;color:#132934}.need-visual-card small{font-size:.92rem;color:#354b58}.reason-group h4{font-size:1.03rem;color:#172a35}.reason-group p{font-size:.93rem;color:#3c505c}.reason-count{font-size:.88rem}
+.visual-callout p,.tip-card p,.support-next-note,.pf-item,.history-node p{color:#354b58}
+
+/* Главные вопросы */
+.decision-focus{border:2px solid #c7dedf;background:linear-gradient(135deg,#eff9f7,#ffffff);border-radius:18px;padding:16px 18px;margin:14px 0 18px}
+.decision-focus b{display:block;color:var(--primary3);font-size:1.06rem;margin-bottom:3px}.decision-focus p{margin:0;color:#314b58;font-size:.98rem}
+
+/* Пояснения не конкурируют с основным действием */
+.help-disclosure{border:1px solid #cfdde4;border-radius:15px;background:#f9fbfc;margin:12px 0;overflow:hidden}
+.help-disclosure>summary{list-style:none;cursor:pointer;padding:13px 15px;font-weight:780;color:#24424f;display:flex;align-items:center;gap:9px;font-size:.98rem}
+.help-disclosure>summary::-webkit-details-marker{display:none}.help-disclosure>summary:before{content:"?";width:27px;height:27px;border-radius:9px;background:#e6f2f3;color:var(--primary);display:grid;place-items:center;font-weight:900;flex:0 0 auto}
+.help-disclosure>summary:after{content:"+";margin-left:auto;color:var(--primary);font-size:1.15rem}.help-disclosure[open]>summary:after{content:"−"}
+.disclosure-body{padding:0 15px 15px;color:#2f4653}.disclosure-body p{margin:4px 0 10px}.disclosure-body ul{margin:8px 0;padding-left:22px}
+
+/* Способ действия: подсказки видны, теория свернута */
+.action-helper{padding:17px 18px;background:linear-gradient(145deg,#f2faf9,#fbfdfe)}
+.action-helper-head{margin-bottom:10px}.action-helper h3{font-size:1.16rem}.action-helper p{font-size:1rem;color:#304855}
+.action-suggestions-title{font-size:1rem;margin-top:12px}.action-suggestion{font-size:.98rem;padding:11px 14px;color:#173f49}
+.action-helper .help-disclosure{margin-top:14px;background:#fff}
+.action-rule{font-size:.96rem;color:#2a414e}.action-example>div{font-size:.96rem}.action-helper-note{font-size:.94rem;color:#384e5b}
+.sequence-hint{font-size:.95rem;color:#344a57}.seq-card input{font-size:1.02rem}
+
+/* Условия: четыре смысловые группы вместо длинной стены чекбоксов */
+.condition-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.condition-group{border:1px solid var(--line);border-radius:17px;background:#fff;overflow:hidden;transition:.18s}.condition-group[open]{border-color:#9fc8ca;box-shadow:0 9px 24px rgba(25,53,73,.06)}.condition-group.selected{background:#fbfefd;border-color:#9fc8ca}
+.condition-group summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:15px}.condition-group summary::-webkit-details-marker{display:none}
+.condition-icon{width:38px;height:38px;border-radius:12px;background:#eaf4f4;color:var(--primary);display:grid;place-items:center;font-weight:900}.condition-group h3{margin:0;font-size:1.03rem;color:#172b36}.condition-group summary p{margin:2px 0 0;color:#3c515e;font-size:.91rem}.condition-count{min-width:30px;height:30px;border-radius:999px;background:#edf4f6;display:grid;place-items:center;font-size:.88rem;font-weight:800;color:#38505d}.condition-group.selected .condition-count{background:var(--accent);color:var(--primary2)}
+.condition-body{padding:0 14px 14px}.condition-body .options{gap:8px}
+
+/* Ресурс: компактная карта оценки */
+.resource-checklist{display:grid;gap:9px;margin:12px 0}.resource-check-row{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 13px;display:grid;grid-template-columns:minmax(230px,1fr) auto;gap:14px;align-items:center}.resource-check-row h4{margin:0;font-size:.98rem;color:#172a35}.resource-check-row .radio-row{justify-content:flex-end}.resource-check-row .radio-pill span{padding:8px 11px;min-height:39px;font-size:.91rem}
+
+/* Анализ: вопрос слева, ответ справа */
+.analysis-question{border:1px solid var(--line);border-radius:15px;background:#fff;padding:13px 14px;margin:10px 0;display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:15px;align-items:center}.analysis-question h3{margin:0;font-size:1rem;color:#172a35}.analysis-question .radio-row{justify-content:flex-end}
+
+/* Итог и мелкие служебные подписи */
+.result-item b{font-size:.94rem;color:#1b5660}.result-item span{font-size:1.02rem;color:#172a35}.footer-note{font-size:.95rem;color:#384b57}
+
+@media(max-width:900px){.condition-grid{grid-template-columns:1fr}.resource-check-row,.analysis-question{grid-template-columns:1fr}.resource-check-row .radio-row,.analysis-question .radio-row{justify-content:flex-start}}
+@media(max-width:680px){
+ :root{--font:18px}.step-card{padding:22px 16px}.step-title h2{font-size:1.52rem}.step-title p{font-size:1rem}
+ .decision-focus{padding:14px}.help-disclosure>summary{padding:12px 13px}.action-helper{padding:15px}
+ .resource-check-row .radio-row,.analysis-question .radio-row{grid-template-columns:1fr 1fr}.resource-check-row .radio-pill span,.analysis-question .radio-pill span{width:100%}
+}
+
+
+/* v4.3 — condition groups open only by explicit checkbox */
+.condition-group{border:1px solid var(--line);border-radius:17px;background:#fff;overflow:hidden;transition:.18s}
+.condition-group.selected{background:#fbfefd;border-color:#9fc8ca}
+.condition-summary{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"icon title count" "toggle toggle toggle";gap:10px 12px;align-items:center;padding:15px}
+.condition-summary .condition-icon{grid-area:icon}
+.condition-summary .condition-title{grid-area:title}
+.condition-summary .condition-count{grid-area:count}
+.condition-summary h3{margin:0;font-size:1.05rem;color:#172b36}
+.condition-summary p{margin:3px 0 0;color:#344c59;font-size:.95rem}
+.condition-toggle-control{grid-area:toggle;display:flex;align-items:center;gap:10px;margin-top:4px;padding:10px 12px;border-radius:12px;background:#f4f8fa;color:#203f4d;font-size:.97rem;font-weight:750;cursor:pointer;user-select:none}
+.condition-toggle-control:hover{background:#edf5f7}
+.condition-toggle-control input{width:20px;height:20px;accent-color:var(--primary);flex:0 0 auto}
+.condition-body{padding:0 14px 14px}
+.condition-body.hidden{display:none!important}
+@media(min-width:760px){
+ .condition-summary{grid-template-columns:auto 1fr auto auto;grid-template-areas:"icon title count toggle"}
+ .condition-toggle-control{margin-top:0;white-space:nowrap}
+}
+
+
+/* v5 — methodological separation: observation -> need -> conditions */
+.need-observation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 22px}
+.need-observation-card{border:1px solid var(--line);border-radius:17px;background:#fff;overflow:hidden}
+.need-observation-card.selected{border-color:#8fbdc0;background:#fbfefe;box-shadow:0 0 0 2px rgba(23,107,115,.05)}
+.need-observation-head{display:flex;align-items:center;gap:11px;padding:14px 14px 8px}
+.need-observation-head b{display:block;color:#17323c;font-size:1.02rem}
+.need-observation-head small{display:block;color:#354c58;font-size:.93rem;margin-top:2px}
+.compact-observation-options{padding:4px 12px 12px}
+.support-node span small{display:block;margin-top:6px;font-size:.86rem;line-height:1.35;color:#3f5360;font-weight:500}
+@media(max-width:760px){.need-observation-grid{grid-template-columns:1fr}}
+
+
+/* v5.1 export */
+.export-modal-card{max-width:720px}
+.export-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
+.export-choice{border:1px solid var(--line);background:#fff;border-radius:16px;padding:16px;text-align:left;cursor:pointer;color:#17323c;font:inherit}
+.export-choice:hover,.export-choice:focus-visible{border-color:#75aeb2;background:#f6fbfb;outline:none;box-shadow:0 0 0 3px rgba(23,107,115,.10)}
+.export-choice b{display:block;font-size:1.12rem;margin-bottom:5px}
+.export-choice span{display:block;color:#405762;line-height:1.45;font-size:.94rem}
+@media(max-width:640px){.export-choice-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">ИОМ</div>
+      <div><h1>ИОМ-Навигатор</h1><small>Цифровой помощник педагога · Автор: Ядрешникова О. В.</small></div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="homeBtn" title="Главная"><span class="label">Главная</span> ⌂</button>
+      <button class="icon-btn" id="cyclesBtn" title="Мои рабочие циклы"><span class="label">Циклы</span> ◫</button>
+      <button class="icon-btn" id="libraryBtn" title="Библиотека методических ситуаций"><span class="label">Библиотека</span> ◈</button>
+      <button class="icon-btn" id="glossaryBtn" title="Справочник специалиста"><span class="label">Справочник</span> ?</button>
+      <button class="icon-btn" id="fontBtn" title="Изменить размер текста">A±</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+<section id="homeView">
+  <div class="hero">
+    <div class="hero-card hero-main">
+      <span class="eyebrow">Индивидуальный образовательный маршрут</span>
+      <h2>ИОМ‑Навигатор: <span class="accent-word">решение шаг за шагом</span></h2>
+      <p class="hero-lead">Цифровой помощник, который помогает педагогу последовательно проанализировать ситуацию, подобрать условия и поддержку, оценить результат и определить следующий шаг ИОМ — без автоматических решений за специалиста.</p>
+      <div class="hero-actions">
+        <button class="btn primary large" id="startBtn">Начать новый рабочий цикл</button>
+        <button class="btn soft large" id="continueBtn">Продолжить сохранённый черновик</button>
+        <button class="btn large" id="demoBtn">Посмотреть пример</button>
+      </div>
+      <div class="hero-trust">
+        <span class="trust-pill"><i class="trust-dot"></i>Работает без регистрации</span>
+        <span class="trust-pill"><i class="trust-dot"></i>Данные сохраняются на устройстве</span>
+        <span class="trust-pill"><i class="trust-dot"></i>Решение остаётся за педагогом</span><span class="trust-pill"><i class="trust-dot"></i>Интерактивная карта ИОМ</span>
+      </div>
+      <div class="notice"><div><b>Главный принцип:</b> сначала образовательная потребность и педагогическая задача, затем условия и поддержка — и только после этого технология и вопрос о необходимости информационного ресурса.</div></div>
+    </div>
+    <div class="hero-card hero-side">
+      <div>
+        <div class="side-kicker">Рабочая логика</div>
+        <h3>От задачи маршрута — к следующему педагогическому решению</h3>
+        <div class="flow-mini">
+          <div><b>1</b><span>Задача ИОМ и актуальная образовательная потребность</span></div>
+          <div><b>2</b><span>Способ действия и условия выполнения</span></div>
+          <div><b>3</b><span>Поддержка, технология и ресурс — только если он нужен</span></div>
+          <div><b>4</b><span>Выполнение, анализ результата и следующий шаг</span></div>
+        </div>
+      </div>
+      <div class="side-footer">ИОМ → задача маршрута → рабочий цикл → результат → педагогическое решение → следующий шаг ИОМ</div>
+    </div>
+  </div>
+
+  <div class="section-label">Быстрый доступ</div>
+  <div class="quick-grid">
+    <button class="quick-card" data-action="start"><span class="quick-icon">01</span><strong>Определить потребность</strong><span>Начать с характера затруднения, а не с диагноза или готового цифрового ресурса.</span></button>
+    <button class="quick-card" data-action="start"><span class="quick-icon">02</span><strong>Конструктор решения</strong><span>Пройти педагогическую логику от задачи ИОМ до следующего решения.</span></button>
+    <button class="quick-card" data-action="cycles"><span class="quick-icon">03</span><strong>Мои рабочие циклы</strong><span>Открыть сохранённые на этом устройстве рабочие карточки.</span></button>
+    <button class="quick-card" data-action="library"><span class="quick-icon">04</span><strong>Библиотека ситуаций</strong><span>Посмотреть методические модели и демонстрационный пример.</span></button>
+  </div>
+
+  <div class="principles">
+    <div class="principle"><span class="principle-icon">✓</span><div><b>Без автоматической диагностики</b><small>Приложение не определяет диагноз, программу и «правильную» методику.</small></div></div>
+    <div class="principle"><span class="principle-icon">↔</span><div><b>Содержание ≠ способ ответа</b><small>При трудностях сначала проверяются условия взаимодействия, а не упрощается задача.</small></div></div>
+    <div class="principle"><span class="principle-icon">∞</span><div><b>Цикличная работа</b><small>Результат одного рабочего цикла становится основанием для следующего шага ИОМ.</small></div></div>
+  </div>
+
+  <div class="footer-note">Не вводите персональные и медицинские данные обучающегося. Используйте условное обозначение.</div>
+</section>
+
+<section id="workView" class="hidden">
+  <div class="mobile-progress">
+    <div class="progress-head"><b id="mobileStepName">Шаг 1</b><span id="mobileProgressText">1 из 10</span></div>
+    <div class="progress-track" id="mobileProgressTrack" role="progressbar" aria-label="Прогресс рабочего цикла" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1"><div class="progress-fill" id="mobileProgressFill"></div></div>
+  </div>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="progress-head"><b>Рабочий цикл</b><span id="progressText">1 из 10</span></div>
+      <div class="progress-track" id="progressTrack" role="progressbar" aria-label="Прогресс рабочего цикла" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="step-nav" id="stepNav"></div>
+    </aside>
+
+    <div class="main-step">
+      <section class="step-card" id="stepCard"></section>
+    </div>
+  </div>
+  <div class="bottom-next hidden" id="bottomNextWrap"><button class="btn primary" id="bottomNextBtn">Далее</button></div>
+</section>
+
+<section id="resultView" class="hidden">
+  <div class="result-card">
+    <div class="step-title">
+      <div class="step-num">✓</div>
+      <div><h2>Рабочая карточка реализации задачи ИОМ</h2><p>Итог сформирован из решений, которые подтвердил специалист.</p></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="saveCycleBtn">Сохранить изменения</button>
+      <button class="btn" id="saveAsNewBtn">Сохранить как новый цикл</button>
+      <button class="btn" id="exportMapBtn">Сохранить карту ИОМ</button>
+      <button class="btn" id="exportCardBtn">Сохранить итоговую карточку</button>
+      <button class="btn" id="printCardBtn">Печать / PDF</button>
+      <button class="btn" id="editCycleBtn">Редактировать</button>
+      <button class="btn" id="newCycleBtn">Создать следующий цикл</button>
+      <button class="btn" id="printBtn">Распечатать / PDF</button>
+      <button class="btn" id="wordBtn">Экспорт в Word</button>
+    </div>
+    <div id="resultRoute"></div>
+    <div id="resultGrid"></div>
+  </div>
+</section>
+</main>
+</div>
+
+<div class="modal hidden" id="tourModal" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+ <div class="modal-card">
+   <div class="modal-head"><h2 id="tourTitle">Как работает ИОМ-Навигатор</h2><button class="close" data-close="tourModal" aria-label="Закрыть">×</button></div>
+   <div id="tourSlides">
+    <div class="tour-slide active"><div class="tour-art"><div class="diagram"><span>Потребность</span><b>→</b><span>Решение</span></div></div><h3>1. Начните не с ресурса, а с образовательной потребности.</h3><p>Приложение помогает сначала понять характер затруднения, а уже потом выбирать инструменты.</p></div>
+    <div class="tour-slide"><div class="tour-art"><div class="diagram"><span>Действие 1</span><b>→</b><span>Действие 2</span><b>→</b><span>Результат</span></div></div><h3>2. Определите, какое действие необходимо ребёнку.</h3><p>Разложите способ действия на понятную последовательность и отметьте, что уже выполняется самостоятельно.</p></div>
+    <div class="tour-slide"><div class="tour-art"><div class="diagram"><span>Условия</span><span>Поддержка</span><span>Средства</span></div></div><h3>3. Подберите условия, поддержку и только затем — средства.</h3><p>Если информационный ресурс не помогает задаче, от него можно отказаться.</p></div>
+    <div class="tour-slide"><div class="tour-art"><div class="diagram"><span>Выполнение</span><b>→</b><span>Анализ</span><b>→</b><span>Следующий шаг</span></div></div><h3>4. Проанализируйте результат и определите следующий шаг ИОМ.</h3><p>Решение всегда подтверждает специалист.</p></div>
+   </div>
+   <div class="nav-actions"><button class="btn" id="tourPrev">Назад</button><button class="btn primary" id="tourNext">Далее</button></div>
+ </div>
+</div>
+
+<div class="modal hidden" id="cyclesModal" role="dialog" aria-modal="true">
+ <div class="modal-card">
+  <div class="modal-head"><h2>Мои рабочие циклы</h2><button class="close" data-close="cyclesModal">×</button></div>
+  <div id="cycleStats" class="dashboard-top"></div>
+  <div class="dashboard-tools">
+    <input id="cycleSearch" type="text" placeholder="Поиск по задаче, классу или направлению">
+    <button class="btn" id="backupBtn">Сохранить резервную копию</button>
+    <button class="btn" id="restoreBtn">Восстановить</button>
+    <input class="import-input" id="restoreInput" type="file" accept="application/json,.json">
+  </div>
+  <div class="backup-note"><b>Важно:</b> рабочие циклы хранятся только в этом браузере. Очистка данных браузера может удалить их. Периодически сохраняйте резервную копию. Не включайте персональные и медицинские данные обучающихся.</div>
+  <div style="margin:10px 0 4px"><button class="btn danger" id="clearLocalBtn">Удалить все локальные данные приложения</button></div>
+  <div id="cycleHistory" class="cycle-history"></div>
+  <div id="savedCycles" class="saved-list" style="margin-top:14px"></div>
+ </div>
+</div>
+
+<div class="modal hidden" id="libraryModal" role="dialog" aria-modal="true">
+ <div class="modal-card">
+  <div class="modal-head"><h2>Библиотека методических ситуаций</h2><button class="close" data-close="libraryModal">×</button></div>
+  <div class="alert info">Примеры являются методическими моделями педагогических ситуаций и не представляют результат экспериментального исследования или описание конкретного обучающегося.</div>
+  <div class="library-filters">
+    <input id="libSearch" type="text" placeholder="Поиск по ситуации или потребности">
+    <select id="libClass"><option value="">Все классы</option><option>1 класс</option><option>2 класс</option><option>3 класс</option><option>4 класс</option></select>
+    <select id="libSubject"><option value="">Все направления</option><option>математика</option><option>русский язык</option><option>литературное чтение</option><option>окружающий мир</option><option>коррекционно-развивающая работа</option><option>логопедическая работа</option></select>
+    <select id="libNeed"><option value="">Все потребности</option><option>структурирование</option><option>инструкция</option><option>визуальная опора</option><option>доступность</option><option>темп</option><option>самопроверка</option><option>речевая опора</option></select>
+  </div>
+  <div class="library-grid" id="libraryGrid"></div>
+ </div>
+</div>
+
+<div class="modal hidden" id="glossaryModal" role="dialog" aria-modal="true">
+ <div class="modal-card">
+  <div class="modal-head"><h2>Справочник специалиста</h2><button class="close" data-close="glossaryModal">×</button></div>
+  <div class="glossary" id="glossaryList"></div>
+ </div>
+</div>
+
+
+<div class="modal hidden" id="exportModal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+ <div class="modal-card export-modal-card">
+  <div class="modal-head">
+   <div><h2 id="exportModalTitle">Сохранить карту ИОМ</h2><p id="exportModalHint">Выберите формат.</p></div>
+   <button class="icon-btn" type="button" data-close="exportModal" aria-label="Закрыть">×</button>
+  </div>
+  <div class="export-choice-grid">
+   <button class="export-choice" type="button" data-export-format="png"><b>PNG</b><span>Изображение для телефона, презентации или отправки</span></button>
+   <button class="export-choice" type="button" data-export-format="pdf"><b>PDF</b><span>Откроется системное окно печати — выберите «Сохранить как PDF»</span></button>
+   <button class="export-choice" type="button" data-export-format="word"><b>Word</b><span>Редактируемый документ .doc с картой или карточкой</span></button>
+   <button class="export-choice" type="button" data-export-format="print"><b>Печать</b><span>Печатная версия без элементов интерфейса</span></button>
+  </div>
+  <div class="backup-note">На iPhone файл обычно появляется в меню загрузок Safari или в приложении «Файлы». PNG создаётся внутри приложения без отправки данных на сервер.</div>
+ </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const clone = o => JSON.parse(JSON.stringify(o));
+
+const stepNames = [
+ "Задача ИОМ","Потребность","Способ действия","Условия","Поддержка",
+ "Технология","Ресурс","Выполнение","Анализ","Следующее решение"
+];
+
+const emptyState = {
+ classLevel:"", direction:"", iomTask:"", studentCode:"",
+ observedDifficulties:[], needs:[], difficultyReasons:[], needOther:"",
+ actionSteps:[""], independentNow:"", helpStage:"",
+ existingSpecialConditions:"",
+ materialConditions:[], paceConditions:[], interactionModes:[], answerModes:[],
+ supportLevel:"", decreaseSupport:"",
+ technologyFunctions:[], technologyOther:"",
+ resourceNeed:"", resourceFunctions:[], resourceName:"", resourceChecklist:{}, resourceDecision:"",
+ executionNotes:"",
+ resultStatus:"", independentlyDone:"", difficultyStage:"", supportNeeded:"",
+ interactionAccessible:"", answerAccessible:"", paceFit:"", resourceHelp:"",
+ conditionEffect:"", transferResult:"",
+ nextDecisions:[], nextOther:"", dismissedTips:{},
+ cycleGroupId:"", cycleNumber:null, parentCycleId:null, savedCycleId:null,
+ createdAt:null
+};
+
+let state = loadDraft() || clone(emptyState);
+let currentStep = Number(localStorage.getItem("iom_current_step") || 0);
+let tourIndex = 0;
+let fontLevel = Number(localStorage.getItem("iom_font_level") || 0);
+
+const options = {
+ directions:["математика","русский язык","литературное чтение","окружающий мир","коррекционно-развивающая работа","логопедическая работа","другое"],
+ observations:[
+ "не удерживает последовательность действий",
+ "затрудняется понять или удержать многошаговую инструкцию",
+ "теряется при большом объёме одновременно представленной информации",
+ "понимает содержание, но физически затрудняется выполнить предусмотренный способ ответа",
+ "затрудняется взаимодействовать с цифровым ресурсом",
+ "не успевает выполнить действие в предложенном темпе",
+ "быстро утомляется при непрерывной деятельности",
+ "затрудняется самостоятельно проверить результат",
+ "затрудняется применить освоенный способ в аналогичной ситуации",
+ "требуется дополнительное наблюдение — характер затруднения пока не определён",
+ "другое"
+ ],
+ needs:[
+ "во внешней организации и удержании последовательности действий",
+ "в короткой и последовательной инструкции",
+ "в регулировании объёма одновременно представленной информации",
+ "в доступном физическом и техническом способе взаимодействия",
+ "в доступном способе представления ответа",
+ "в индивидуальном темпе и/или дополнительном времени",
+ "в возможности паузы и дозировании непрерывной нагрузки",
+ "в визуальной опоре для организации действия",
+ "в речевой опоре для организации действия",
+ "в дозированной педагогической поддержке",
+ "в организации самопроверки",
+ "в проверке переноса освоенного способа в аналогичную ситуацию",
+ "другое"
+ ],
+ reasons:[
+ "затруднение проявилось при понимании содержания",
+ "затруднение проявилось при понимании инструкции",
+ "затруднение проявилось при удержании последовательности",
+ "затруднение проявилось при большом объёме информации",
+ "затруднение связано с физической доступностью способа ответа",
+ "способ взаимодействия с ресурсом оказался недоступным",
+ "не хватило времени",
+ "возникло утомление",
+ "информационный ресурс усложнил выполнение",
+ "причина требует дополнительного наблюдения",
+ "другое"
+ ],
+ material:["последовательное представление","визуальное выделение существенного","уменьшение объёма одновременно представленной информации","увеличение изображения","короткая инструкция","визуальная схема","речевая опора","повторное представление материала","другое"],
+ pace:["общий темп","индивидуальный темп","дополнительное время","возможность паузы"],
+ interaction:["письмо","выбор","нажатие","перетаскивание","указание","карточка","устный ответ","другой доступный способ"],
+ answer:["письменный","устный","выбор варианта","карточка","указание","цифровой ответ","альтернативный способ ответа"],
+ technology:["поэтапная организация деятельности","визуальная поддержка","моделирование","игровые элементы","упражнения на формирование речевого действия","организация самопроверки","другое"],
+ resourceFunctions:["последовательно представлять материал","визуально выделять существенное","уменьшать объём одновременно представленной информации","обеспечивать повторение","предоставлять доступный способ ответа","обеспечивать непосредственную обратную связь","позволять работать в индивидуальном темпе","поддерживать самопроверку","другое"],
+ checklist:["Ресурс соответствует образовательной задаче?","Помогает выполнить необходимый способ действия?","Материал представлен доступно?","Объём информации соответствует текущим возможностям выполнения?","Управление доступно?","Способ ответа доступен?","Есть возможность повторения?","Можно изменить темп?","Есть понятная обратная связь?","Использование ресурса остаётся доступным и не усложняет выполнение?"],
+ next:["сохранить условия","уменьшить педагогическую поддержку","изменить условия представления материала","изменить опору","изменить способ взаимодействия","изменить способ ответа","адаптировать информационный ресурс","заменить ресурс","отказаться от ресурса","продолжить освоение действия","перейти к самостоятельному выполнению","проверить перенос способа действия в аналогичной ситуации","перейти к следующей задаче ИОМ","другое"]
+};
+
+function saveDraft(){
+  localStorage.setItem("iom_draft",JSON.stringify(state));
+  localStorage.setItem("iom_current_step",currentStep);
+}
+function normalizeState(raw){
+  if(!raw || typeof raw!=="object")return clone(emptyState);
+  const s={...clone(emptyState),...raw};
+  s.observedDifficulties=Array.isArray(raw.observedDifficulties)?raw.observedDifficulties.slice():[];
+  // Compatibility with v4: old "reasons" were mostly observations.
+  if(!s.observedDifficulties.length && Array.isArray(raw.difficultyReasons)) s.observedDifficulties=raw.difficultyReasons.slice();
+  s.needs=Array.isArray(raw.needs)?raw.needs.slice():[];
+  s.actionSteps=Array.isArray(raw.actionSteps)&&raw.actionSteps.length?raw.actionSteps.slice():[""];
+  s.materialConditions=Array.isArray(raw.materialConditions)?raw.materialConditions.slice():[];
+  s.paceConditions=Array.isArray(raw.paceConditions)?raw.paceConditions.slice():[];
+  s.interactionModes=Array.isArray(raw.interactionModes)?raw.interactionModes.slice():[];
+  s.answerModes=Array.isArray(raw.answerModes)?raw.answerModes.slice():[];
+  s.technologyFunctions=Array.isArray(raw.technologyFunctions)?raw.technologyFunctions.slice():[];
+  s.resourceFunctions=Array.isArray(raw.resourceFunctions)?raw.resourceFunctions.slice():[];
+  s.nextDecisions=Array.isArray(raw.nextDecisions)?raw.nextDecisions.slice():[];
+  s.dismissedTips=raw.dismissedTips&&typeof raw.dismissedTips==="object"?raw.dismissedTips:{};
+  return s;
+}
+function loadDraft(){
+  try{
+    const raw=JSON.parse(localStorage.getItem("iom_draft"));
+    return raw?normalizeState(raw):null;
+  }catch(e){return null}
+}
+function escapeHTML(v=""){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function checked(arr,val){return arr?.includes(val)?"checked":""}
+function radio(name,val,current,label){
+ return `<label class="radio-pill"><input type="radio" name="${name}" value="${escapeHTML(val)}" ${current===val?"checked":""}><span>${escapeHTML(label||val)}</span></label>`;
+}
+function checkbox(name,val,arr,label){
+ return `<label class="option"><input type="checkbox" name="${name}" value="${escapeHTML(val)}" ${checked(arr,val)}><span>${escapeHTML(label||val)}</span></label>`;
+}
+function fieldLabel(t){return `<label class="field-label">${t}</label>`}
+function macroIndex(step=currentStep){
+ if(step===0)return 0;if(step===1)return 1;if(step===2)return 2;if(step>=3&&step<=6)return 3;if(step>=7&&step<=8)return 4;return 5;
+}
+function routeMapHTML(step=currentStep){
+ const nodes=[
+  {n:"Задача ИОМ",s:0,p:state.iomTask},
+  {n:"Потребность",s:1,p:(state.needs||[])[0]||state.needOther},
+  {n:"Способ действия",s:2,p:(state.actionSteps||[]).filter(Boolean).join(" → ")},
+  {n:"Условия и средства",s:3,p:[...(state.materialConditions||[]),...(state.paceConditions||[])].slice(0,2).join("; ")},
+  {n:"Результат",s:8,p:state.resultStatus},
+  {n:"Следующий шаг",s:9,p:(state.nextDecisions||[])[0]||state.nextOther}
+ ];
+ const active=macroIndex(step);
+ return `<div class="iom-route" aria-label="Карта реализации ИОМ">${nodes.map((x,i)=>`<div class="iom-route-node ${i<active?"done":""} ${i===active?"active":""}" data-route-step="${x.s}" role="button" tabindex="0" aria-label="Перейти: ${escapeHTML(x.n)}"><small>${i<active?"завершено":i===active?"сейчас":"далее"}</small><b>${escapeHTML(x.n)}</b><span class="route-preview">${escapeHTML(x.p||"пока не заполнено")}</span></div>`).join("")}</div>`;
+}
+function uniquePush(target,values=[]){values.forEach(v=>{if(v&&!target.includes(v))target.push(v)})}
+function getGuidance(){
+ const o=state.observedDifficulties||[], n=state.needs||[];
+ if(o.some(x=>x.includes("физически")||x.includes("цифровым ресурсом")) || n.some(x=>x.includes("физическом")||x.includes("способе представления ответа"))){
+  return {title:"Сначала проверьте доступность способа выполнения",text:"Если содержательное действие доступно, можно рассмотреть изменение взаимодействия или способа ответа без автоматического упрощения учебной задачи.",material:[],pace:[],interaction:["выбор","нажатие","указание","карточка","устный ответ"],answer:["устный","выбор варианта","карточка","указание","альтернативный способ ответа"]};
+ }
+ if(o.some(x=>x.includes("последовательност")||x.includes("многошаговую")||x.includes("большом объёме")) || n.some(x=>x.includes("последовательности")||x.includes("короткой")||x.includes("объёма"))){
+  return {title:"Можно рассмотреть внешнюю организацию действия",text:"В качестве вариантов проверьте последовательное предъявление, короткую инструкцию, уменьшение объёма информации и визуальную схему. Это варианты для профессионального выбора.",material:["последовательное представление","короткая инструкция","визуальная схема","уменьшение объёма одновременно представленной информации"],pace:[],interaction:[],answer:[]};
+ }
+ if(o.some(x=>x.includes("темпе")||x.includes("утомляется")) || n.some(x=>x.includes("темпе")||x.includes("пауз"))){
+  return {title:"Проверьте темп и продолжительность работы",text:"Можно рассмотреть индивидуальный темп, дополнительное время или возможность паузы, сохраняя содержательную задачу.",material:[],pace:["индивидуальный темп","дополнительное время","возможность паузы"],interaction:[],answer:[]};
+ }
+ if(n.some(x=>x.includes("визуальной опоре"))){return {title:"Визуальная опора — один из возможных способов",text:"Можно рассмотреть визуальную схему или выделение существенного, а затем проверить, помогло ли именно это изменение.",material:["визуальная схема","визуальное выделение существенного"],pace:[],interaction:[],answer:[]};}
+ if(n.some(x=>x.includes("самопроверки"))){return {title:"Можно организовать явную самопроверку",text:"Рассмотрите понятный алгоритм проверки и обратную связь. Решение подтверждает педагог.",material:[],pace:[],interaction:[],answer:[],technology:["организация самопроверки"]};}
+ return null;
+}
+function guidanceHTML(){
+ const g=getGuidance(); if(!g || state.dismissedTips?.[currentStep])return "";
+ return `<div class="tip-card" id="contextTip"><div class="tip-kicker">Контекстная подсказка</div><h3>${escapeHTML(g.title)}</h3><p>${escapeHTML(g.text)}</p><div class="tip-actions"><button type="button" class="btn soft" data-tip-action="accept">Принять</button><button type="button" class="btn" data-tip-action="change">Изменить вручную</button><button type="button" class="btn" data-tip-action="reject">Не использовать</button></div><div id="tipConfirm" class="tip-confirm hidden">Варианты добавлены. Вы можете изменить их на соответствующем этапе.</div></div>`;
+}
+function applyGuidance(){
+ const g=getGuidance(); if(!g)return;
+ uniquePush(state.materialConditions,g.material||[]);uniquePush(state.paceConditions,g.pace||[]);uniquePush(state.interactionModes,g.interaction||[]);uniquePush(state.answerModes,g.answer||[]);uniquePush(state.technologyFunctions,g.technology||[]);saveDraft();
+ const c=$("#tipConfirm");if(c)c.classList.remove("hidden");showToast("Рекомендация добавлена как редактируемый вариант, а не как автоматическое решение.");
+}
+function stepHeader(n,title,sub){
+ return `${routeMapHTML()}<div class="step-title"><div class="step-num">${n}</div><div><h2>${title}</h2><p>${sub}</p></div></div>`;
+}
+function navButtons(){
+ return `<div class="nav-actions"><button class="btn" id="prevBtn">${currentStep===0?"На главную":"Назад"}</button><button class="btn primary next-desktop" id="nextBtn">${currentStep===9?"Сформировать карточку":"Далее"}</button></div>`;
+}
+function renderNav(){
+ const nav=$("#stepNav"); nav.innerHTML="";
+ stepNames.forEach((n,i)=>{
+   const b=document.createElement("button");
+   b.textContent=n; b.dataset.step=i+1;
+   if(i===currentStep){b.className="active";b.setAttribute("aria-current","step");}
+   else if(i<currentStep)b.className="done";
+   b.onclick=()=>{captureStep();currentStep=i;saveDraft();renderStep();};
+   nav.appendChild(b);
+ });
+ const pct=(currentStep+1)*10;
+ $("#progressFill").style.width=pct+"%"; $("#mobileProgressFill").style.width=pct+"%";
+ $("#progressText").textContent=`${currentStep+1} из 10`; $("#mobileProgressText").textContent=`${currentStep+1} из 10`;
+ $("#progressTrack")?.setAttribute("aria-valuenow",String(currentStep+1));
+ $("#mobileProgressTrack")?.setAttribute("aria-valuenow",String(currentStep+1));
+ $("#mobileStepName").textContent=`${currentStep+1}. ${stepNames[currentStep]}`;
+ $("#bottomNextWrap").classList.remove("hidden");
+ $("#bottomNextBtn").textContent=currentStep===9?"Сформировать карточку":"Далее";
+}
+
+function renderStep(preserveScroll=false){
+ const previousScroll=window.scrollY;
+ $("#homeView").classList.add("hidden"); $("#resultView").classList.add("hidden"); $("#workView").classList.remove("hidden");
+ renderNav();
+ const c=$("#stepCard");
+ if(currentStep===0)c.innerHTML=step1();
+ if(currentStep===1)c.innerHTML=step2();
+ if(currentStep===2)c.innerHTML=step3();
+ if(currentStep===3)c.innerHTML=step4();
+ if(currentStep===4)c.innerHTML=step5();
+ if(currentStep===5)c.innerHTML=step6();
+ if(currentStep===6)c.innerHTML=step7();
+ if(currentStep===7)c.innerHTML=step8();
+ if(currentStep===8)c.innerHTML=step9();
+ if(currentStep===9)c.innerHTML=step10();
+ bindStep();
+ if(preserveScroll){
+   requestAnimationFrame(()=>window.scrollTo({top:previousScroll,behavior:"auto"}));
+ }else{
+   window.scrollTo({top:0,behavior:"smooth"});
+ }
+}
+
+function step1(){
+ return `${stepHeader(1,"С какой задачей ИОМ вы работаете?","Зафиксируйте одну конкретную задачу маршрута, с которой работаете сейчас.")}
+ <div class="decision-focus"><b>Главный вопрос этого шага</b><p>Какое действие, умение или способ деятельности планируется формировать или развивать?</p></div>
+ <div class="two">
+  <div class="field">${fieldLabel("Класс")}<select id="classLevel"><option value="">Выберите</option>${[1,2,3,4].map(x=>`<option ${state.classLevel==x?"selected":""}>${x}</option>`).join("")}</select></div>
+  <div class="field">${fieldLabel("Направление работы")}<select id="direction"><option value="">Выберите</option>${options.directions.map(x=>`<option ${state.direction===x?"selected":""}>${x}</option>`).join("")}</select></div>
+ </div>
+ <div class="field">${fieldLabel("Ученик / условное обозначение")}<input id="studentCode" type="text" value="${escapeHTML(state.studentCode)}" placeholder="Например: Ученик А"><div class="hint">Используйте условное обозначение вместо персональных данных.</div></div>
+ <div class="field">${fieldLabel("Задача ИОМ")}<textarea id="iomTask" placeholder="Например: формирование способа сравнения количеств">${escapeHTML(state.iomTask)}</textarea></div>
+ <details class="help-disclosure"><summary>Что считать задачей ИОМ?</summary><div class="disclosure-body"><p>Формулировка должна описывать конкретное формируемое действие или умение, а не диагноз и не общую характеристику ребёнка.</p><p><b>Например:</b> «формирование способа сравнения количеств», «освоение последовательности проверки безударной гласной».</p></div></details>
+ ${navButtons()}`;
+}
+
+function step2(){
+ const observationGroups=[
+  {icon:"1",title:"Организация действия",sub:"Последовательность, инструкция, объём",items:["не удерживает последовательность действий","затрудняется понять или удержать многошаговую инструкцию","теряется при большом объёме одновременно представленной информации"]},
+  {icon:"2",title:"Доступность выполнения",sub:"Физический и технический способ ответа",items:["понимает содержание, но физически затрудняется выполнить предусмотренный способ ответа","затрудняется взаимодействовать с цифровым ресурсом"]},
+  {icon:"3",title:"Темп и нагрузка",sub:"Время, утомление, непрерывная работа",items:["не успевает выполнить действие в предложенном темпе","быстро утомляется при непрерывной деятельности"]},
+  {icon:"4",title:"Самоконтроль и перенос",sub:"Проверка результата и новая ситуация",items:["затрудняется самостоятельно проверить результат","затрудняется применить освоенный способ в аналогичной ситуации"]},
+  {icon:"5",title:"Нужно наблюдение",sub:"Пока недостаточно данных для вывода",items:["требуется дополнительное наблюдение — характер затруднения пока не определён","другое"]}
+ ];
+ const observationCards=observationGroups.map(g=>{
+   const active=g.items.some(x=>(state.observedDifficulties||[]).includes(x));
+   return `<div class="need-observation-card ${active?"selected":""}">
+     <div class="need-observation-head"><span class="need-visual-icon">${g.icon}</span><span><b>${escapeHTML(g.title)}</b><small>${escapeHTML(g.sub)}</small></span></div>
+     <div class="options compact-observation-options">${g.items.map(x=>checkbox("observed",x,state.observedDifficulties||[])).join("")}</div>
+   </div>`;
+ }).join("");
+
+ return `${stepHeader(2,"Наблюдаемое затруднение и образовательная потребность","Сначала зафиксируйте то, что реально наблюдается. Затем сформулируйте педагогическую гипотезу о потребности.")}
+ <div class="decision-focus"><b>Главный принцип этого шага</b><p>Не «почему ребёнок не справился», а <b>где и в чём проявилось затруднение</b>. Потребность формулируется как рабочая педагогическая гипотеза и подтверждается специалистом.</p></div>
+
+ <h3>1. Что наблюдается в конкретной ситуации?</h3>
+ <p class="hint">Отмечайте наблюдаемые проявления, а не предполагаемую причину или диагноз.</p>
+ <div class="need-observation-grid">${observationCards}</div>
+
+ <h3 style="margin-top:24px">2. Какая актуальная образовательная потребность может быть с этим связана?</h3>
+ <p class="hint">Выберите только те потребности, которые вы готовы рассматривать как рабочую гипотезу.</p>
+ <div class="options">${options.needs.map(x=>checkbox("needs",x,state.needs)).join("")}</div>
+
+ <div class="field">${fieldLabel("Свой вариант / уточнение")}<textarea id="needOther" placeholder="Например: требуется внешняя организация перехода от одного шага к следующему.">${escapeHTML(state.needOther)}</textarea></div>
+
+ <details class="help-disclosure"><summary>Почему «визуальная схема» не записана как готовая потребность?</summary><div class="disclosure-body"><p>Потребность описывает, <b>что требуется для организации обучения</b>, а конкретная визуальная схема, короткая инструкция или карточка — это уже возможное условие или средство. Они выбираются на следующем этапе.</p></div></details>
+ <div id="guidanceHost">${guidanceHTML()}</div>
+ ${navButtons()}`;
+}
+
+function getActionSuggestions(){
+ const d=(state.direction||"").toLowerCase(), task=(state.iomTask||"").toLowerCase(), needs=(state.needs||[]).join(" ").toLowerCase();
+ let list=[];
+ if(task.includes("сравнен") && (task.includes("колич")||d.includes("математ"))){
+   list=["посчитать первую группу","посчитать вторую группу","сравнить результаты","выбрать знак","проверить ответ"];
+ }else if(d.includes("математ")){
+   list=["прочитать условие","выделить данные","определить действие","выполнить действие","проверить результат","записать ответ"];
+ }else if(d.includes("русский")){
+   list=["прочитать задание","найти нужное слово или часть текста","вспомнить правило","применить правило","записать ответ","проверить написанное"];
+ }else if(d.includes("литератур")||d.includes("чтени")){
+   list=["прочитать фрагмент","выделить ключевую информацию","найти подтверждение в тексте","сформулировать ответ","проверить ответ по тексту"];
+ }else if(d.includes("окружающ")){
+   list=["рассмотреть объект или условие","выделить существенные признаки","сравнить признаки","отнести к группе","сформулировать вывод"];
+ }else if(d.includes("логопед")){
+   list=["услышать или произнести образец","выделить звук или слог","выполнить речевое действие","повторить самостоятельно","сравнить с образцом"];
+ }else if(d.includes("коррекционно")){
+   list=["выслушать короткую инструкцию","назвать первый шаг","выполнить один шаг","свериться с опорой","перейти к следующему шагу","проверить результат"];
+ }else{
+   list=["понять короткую инструкцию","выполнить первый шаг","выполнить следующий шаг","проверить результат","дать ответ"];
+ }
+ if(needs.includes("последовательност")||needs.includes("многошаг")){
+   ["назвать первый шаг","отметить выполненный шаг","перейти к следующему шагу"].forEach(x=>{if(!list.includes(x))list.push(x)});
+ }
+ if(needs.includes("самостоятельно проверить")){
+   ["сверить результат с образцом","исправить найденную ошибку"].forEach(x=>{if(!list.includes(x))list.push(x)});
+ }
+ return list.slice(0,9);
+}
+function actionHelperHTML(){
+ const suggestions=getActionSuggestions();
+ return `<div class="action-helper"><div class="action-helper-head"><div class="action-helper-icon">✦</div><div><h3>Подсказки для этого шага</h3><p>Нажмите на подходящее действие — оно добавится в цепочку как редактируемая карточка.</p></div></div><div class="action-suggestions-title">Варианты для выбранного направления</div><div class="action-suggestions">${suggestions.map(x=>`<button type="button" class="action-suggestion" data-action-suggestion="${escapeHTML(x)}">${escapeHTML(x)}</button>`).join("")}</div><details class="help-disclosure"><summary>Как правильно формулировать способ действия?</summary><div class="disclosure-body"><div class="action-rule-grid"><div class="action-rule"><b>1 действие = 1 карточка</b>Один наблюдаемый шаг без нескольких задач внутри.</div><div class="action-rule"><b>Начинайте с глагола</b>Например: прочитать, выбрать, сравнить, назвать, проверить.</div><div class="action-rule"><b>Сохраняйте содержание задачи</b>Не заменяйте учебное действие описанием помощи или диагноза.</div></div><div class="action-example"><div class="better"><b>Лучше</b>«сравнить результаты → выбрать знак»</div><div class="avoid"><b>Неудачно</b>«понять сравнение» или «развивать внимание» — это нельзя увидеть как конкретный шаг.</div></div><div class="action-helper-note">Подсказки — только варианты. Педагог выбирает, редактирует или полностью формулирует шаг самостоятельно.</div></div></details></div>`;
+}
+
+function addActionSuggestion(text){
+ const clean=(text||"").trim(); if(!clean)return;
+ const filled=(state.actionSteps||[]).filter(x=>x&&x.trim());
+ if(filled.includes(clean)){showToast("Такое действие уже есть в цепочке.");return;}
+ if(!state.actionSteps || !state.actionSteps.length || (state.actionSteps.length===1 && !state.actionSteps[0].trim())) state.actionSteps=[clean];
+ else state.actionSteps.push(clean);
+ saveDraft();renderStep(true);showToast("Действие добавлено как редактируемая подсказка.");
+}
+
+function step3(){
+ return `${stepHeader(3,"Что ребёнку необходимо научиться делать последовательно?","Соберите способ действия как понятную наблюдаемую цепочку. Можно использовать подсказки и затем отредактировать их под конкретную задачу.")}
+ <div class="decision-focus"><b>Главный вопрос этого шага</b><p>Какие конкретные действия ребёнок должен выполнить по порядку, чтобы решить задачу?</p></div>
+ ${actionHelperHTML()}
+ <div class="sequence-hint">Карточки можно переставлять: на компьютере — мышью, на телефоне — стрелками вверх и вниз.</div>
+ <div id="sequence" class="sequence">${state.actionSteps.map((x,i)=>seqRow(x,i)).join("")}</div>
+ <button class="btn soft" id="addStepBtn">+ Добавить своё действие</button>
+ <div class="two">
+  <div class="field">${fieldLabel("Что ребёнок уже выполняет самостоятельно?")}<textarea id="independentNow" placeholder="Например: самостоятельно читает короткую инструкцию и выполняет первый шаг.">${escapeHTML(state.independentNow)}</textarea></div>
+  <div class="field">${fieldLabel("На каком этапе требуется помощь?")}<textarea id="helpStage" placeholder="Например: при переходе ко второму шагу или при самопроверке.">${escapeHTML(state.helpStage)}</textarea></div>
+ </div>${guidanceHTML()}${navButtons()}`;
+}
+function seqRow(v,i){
+ const connector=i<state.actionSteps.length-1?'<div class="seq-connector"></div>':'';
+ return `<div><div class="seq-card" draggable="true" data-seq-index="${i}"><button type="button" class="drag-handle" title="Перетащить">⠿</button><div class="seq-number">${i+1}</div><input type="text" class="action-step" value="${escapeHTML(v)}" placeholder="Действие ${i+1}"><div class="seq-actions"><button type="button" class="move-step" data-dir="-1" data-i="${i}" title="Выше">↑</button><button type="button" class="move-step" data-dir="1" data-i="${i}" title="Ниже">↓</button><button type="button" class="remove-step" data-i="${i}" title="Удалить">×</button></div></div>${connector}</div>`;
+}
+function step4(){
+ return `${stepHeader(4,"Какие условия помогут выполнить действие?","Сначала учтите уже предусмотренные условия, затем выберите дополнительные условия для этой конкретной задачи.")}
+ <div class="decision-focus"><b>Сначала условия — потом упрощение содержания</b><p>Если ребёнок понимает учебное действие, но затрудняется его выполнить или представить ответ, сначала измените условия выполнения, а не содержательную сложность.</p></div>
+ <div class="field">${fieldLabel("Какие специальные условия или способы поддержки уже предусмотрены?")}<textarea id="existingSpecialConditions" placeholder="Например: увеличенный размер элементов, дополнительное время, использование технических средств, речевая или визуальная опора. Не вводите медицинские данные.">${escapeHTML(state.existingSpecialConditions)}</textarea><div class="hint">Укажите только условия, значимые для организации этой работы. Поле можно оставить пустым.</div></div>
+ <h3>Дополнительные условия для текущей задачи</h3>
+ <div class="condition-grid">
+  ${conditionBox("Представление материала","material",options.material,state.materialConditions,"◫","Как предъявляется информация")}
+  ${conditionBox("Темп","pace",options.pace,state.paceConditions,"◷","Время, паузы и скорость работы")}
+  ${conditionBox("Способ взаимодействия","interaction",options.interaction,state.interactionModes,"↔","Как ребёнок выполняет действие")}
+  ${conditionBox("Способ представления ответа","answer",options.answer,state.answerModes,"✓","Как ребёнок показывает результат")}
+ </div>
+ <details class="help-disclosure"><summary>Показать пример: содержание доступно, а способ ответа — нет</summary><div class="disclosure-body"><p>Ребёнок понимает, что 7 &gt; 5, но из-за двигательных трудностей не может перетащить маленький знак в поле. В этом случае сначала можно изменить способ взаимодействия: увеличить элементы, заменить перетаскивание нажатием, разрешить карточку, указание или устный ответ.</p></div></details>
+ ${guidanceHTML()}${navButtons()}`;
+}
+function conditionBox(title,name,arr,selected,icon="•",sub=""){
+ const count=(selected||[]).length;
+ const expanded=count>0;
+ const toggleId=`condition-toggle-${name}`;
+ return `<div class="condition-group ${count?"selected":""}" data-condition-group="${name}">
+   <div class="condition-summary">
+     <span class="condition-icon">${icon}</span>
+     <span class="condition-title"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(sub)}</p></span>
+     <span class="condition-count">${count}</span>
+     <label class="condition-toggle-control" for="${toggleId}">
+       <input type="checkbox" class="condition-toggle" id="${toggleId}" ${expanded?"checked":""}>
+       <span class="condition-toggle-label">${expanded?"Скрыть варианты":"Показать варианты"}</span>
+     </label>
+   </div>
+   <div class="condition-body ${expanded?"":"hidden"}"><div class="options">${arr.map(x=>checkbox(name,x,selected)).join("")}</div></div>
+ </div>`;
+}
+
+function step5(){
+ const levels=[
+  {v:"полная помощь",d:"Педагог фактически организует и сопровождает выполнение большинства шагов."},
+  {v:"совместное выполнение",d:"Ребёнок выполняет действие вместе со специалистом, разделяя отдельные шаги."},
+  {v:"визуальная/речевая опора",d:"Действие выполняется ребёнком, но используется внешняя схема, образец или речевая опора."},
+  {v:"краткая подсказка",d:"Требуется отдельный сигнал или краткое напоминание без выполнения шага за ребёнка."},
+  {v:"самостоятельное выполнение",d:"Действие выполняется без педагогической помощи в данной ситуации."}
+ ];
+ const idx=levels.findIndex(x=>x.v===state.supportLevel);
+ const next=state.supportLevel && idx>=0&&idx<levels.length-1?levels[idx+1].v:"определяется после наблюдения";
+ return `${stepHeader(5,"Педагогическая поддержка","Отметьте объём помощи, фактически необходимый для выполнения действия.")}
+ <div class="decision-focus"><b>Поддержка — это объём помощи, а не результат обучения</b><p>«Перенос способа действия» вынесен из этой шкалы: он проверяется отдельно на этапе анализа результата.</p></div>
+ <div class="support-path">${levels.map((x,i)=>`<label class="support-node"><input type="radio" name="support" value="${x.v}" ${state.supportLevel===x.v?"checked":""}><span><span class="support-dot">${i+1}</span><b>${x.v}</b><small>${x.d}</small></span></label>`).join("")}</div>
+ <div class="support-readout"><div><small>Текущий уровень</small><b id="supportCurrent">${escapeHTML(state.supportLevel||"не выбран")}</b></div><div><small>Следующий уровень для проверки</small><b id="supportNext">${escapeHTML(next)}</b><div class="support-next-note">Это не автоматическая рекомендация. Возможность уменьшения помощи подтверждает специалист после анализа результата.</div></div></div>
+ <div class="field">${fieldLabel("Можно ли уменьшить поддержку после выполнения?")}<div class="radio-row">${["Да","Нет","Требуется дополнительное наблюдение"].map(x=>radio("decrease",x,state.decreaseSupport)).join("")}</div></div>
+ ${guidanceHTML()}${navButtons()}`;
+}
+
+function step6(){
+ return `${stepHeader(6,"Какую функцию должна выполнять технология?","Выбирайте технологию по её педагогической функции, а не по названию диагноза.")}
+ <div class="decision-focus"><b>Главный вопрос этого шага</b><p>Какую педагогическую функцию должна выполнять технология в выбранных условиях?</p></div>
+ <div class="options">${options.technology.map(x=>checkbox("technology",x,state.technologyFunctions)).join("")}</div>
+ <div class="field">${fieldLabel("Свой вариант")}<input id="technologyOther" type="text" value="${escapeHTML(state.technologyOther)}"></div>
+ <details class="help-disclosure"><summary>Почему нет готовой технологии «по диагнозу»?</summary><div class="disclosure-body">Одинаковая категория ОВЗ не означает одинаковую актуальную потребность. Специалист может принять вариант, изменить его, добавить свой или не использовать.</div></details>${guidanceHTML()}${navButtons()}`;
+}
+
+function step7(){
+ const showYes=state.resourceNeed==="ДА";
+ const checklist=options.checklist.map((q,i)=>{
+   const v=state.resourceChecklist[i]||"";
+   return `<div class="resource-check-row"><h4>${q}</h4><div class="radio-row">${["Да","Частично","Нет","Не определено"].map(x=>radio("cl_"+i,x,v)).join("")}</div></div>`;
+ }).join("");
+ return `${stepHeader(7,"Нужен ли информационный ресурс для решения этой задачи?","Сначала определите функцию ресурса. Сам факт его цифрового формата не делает его полезнее.")}
+ <div class="decision-focus"><b>Главный вопрос этого шага</b><p>Поможет ли ресурс выполнить выбранное учебное действие в нужных условиях — или создаст дополнительную трудность?</p></div>
+ <div class="radio-row">${["ДА","НЕТ","НЕ УВЕРЕН"].map(x=>radio("resourceNeed",x,state.resourceNeed)).join("")}</div>
+ <div id="resourceNo" class="alert ok ${state.resourceNeed==="НЕТ"?"":"hidden"}">Использование информационного ресурса не является обязательным. Если задача эффективнее решается с помощью предметного материала, карточек, схемы, устной работы или другого средства, цифровой ресурс может не использоваться.</div>
+ <div id="resourceYes" class="${showYes?"":"hidden"}">
+   <div class="section-box"><h3>Какую функцию должен выполнять ресурс?</h3><div class="options">${options.resourceFunctions.map(x=>checkbox("resourceFunctions",x,state.resourceFunctions)).join("")}</div></div>
+   <div class="field">${fieldLabel("Конкретный ресурс, если уже выбран")}<input id="resourceName" type="text" value="${escapeHTML(state.resourceName)}" placeholder="Название можно оставить пустым"></div>
+   <h3>Карта оценки информационного ресурса</h3><div class="resource-checklist">${checklist}</div>
+   <div class="alert info">На основании отмеченных характеристик специалист может принять решение.</div>
+   <div class="radio-row">${["Использовать","Использовать с адаптацией","Заменить","Отказаться от ресурса"].map(x=>radio("resourceDecision",x,state.resourceDecision)).join("")}</div>
+ </div>${guidanceHTML()}${navButtons()}`;
+}
+
+function step8(){
+ return `${stepHeader(8,"Выполнение","Зафиксируйте только существенные наблюдения, которые помогут принять следующее решение.")}
+ <div class="decision-focus"><b>Наблюдайте за процессом, а не только за ответом</b><p>Где ребёнок действовал самостоятельно? Где появилась трудность? Какая поддержка реально помогла?</p></div>
+ <details class="help-disclosure"><summary>Что здесь не оценивается?</summary><div class="disclosure-body">Приложение не оценивает интеллект, не ставит диагноз и не назначает коррекционную работу. Этот шаг нужен только для структурирования педагогического наблюдения.</div></details>
+ <div class="field">${fieldLabel("Что происходило во время выполнения?")}<textarea id="executionNotes" placeholder="Кратко: как ребёнок приступил к заданию, где потребовалась поддержка, что помогло или мешало.">${escapeHTML(state.executionNotes)}</textarea></div>${navButtons()}`;
+}
+
+function planFactHTML(){
+ const planned=[
+  state.supportLevel?`Поддержка: ${state.supportLevel}`:"Поддержка пока не выбрана",
+  state.materialConditions?.length?`Материал: ${state.materialConditions.slice(0,2).join("; ")}`:"Условия представления не заполнены",
+  state.paceConditions?.length?`Темп: ${state.paceConditions.join("; ")}`:"Темп не указан",
+  state.interactionModes?.length?`Взаимодействие: ${state.interactionModes.slice(0,2).join("; ")}`:"Способ взаимодействия не указан"
+ ];
+ const fact=[
+  state.resultStatus?`Результат: ${state.resultStatus}`:"Результат ещё не отмечен",
+  state.supportNeeded?`Потребовалось: ${state.supportNeeded}`:"Фактическая помощь ещё не описана",
+  state.difficultyStage?`Затруднение: ${state.difficultyStage}`:"Место затруднения ещё не указано"
+ ];
+ return `<div class="plan-fact"><div class="plan-fact-card plan"><span class="pf-kicker">Планировали</span><h3>Условия и поддержка</h3><div class="pf-list">${planned.map(x=>`<div class="pf-item">${escapeHTML(x)}</div>`).join("")}</div></div><div class="plan-fact-card fact"><span class="fact-pulse">Фактическое выполнение</span><h3>Что произошло</h3><div class="pf-list" id="factList">${fact.map(x=>`<div class="pf-item">${escapeHTML(x)}</div>`).join("")}</div></div></div>`;
+}
+function updatePlanFact(){
+ const host=$("#factList");if(!host)return;
+ const facts=[rad("resultStatus")?`Результат: ${rad("resultStatus")}`:"Результат ещё не отмечен",val("supportNeeded")?`Потребовалось: ${val("supportNeeded")}`:"Фактическая помощь ещё не описана",val("difficultyStage")?`Затруднение: ${val("difficultyStage")}`:"Место затруднения ещё не указано"];
+ host.innerHTML=facts.map(x=>`<div class="pf-item">${escapeHTML(x)}</div>`).join("");
+}
+
+function step9(){
+ return `${stepHeader(9,"Что произошло во время выполнения?","Сопоставьте запланированные условия с фактическим выполнением и зафиксируйте динамику.")}
+ <div class="decision-focus"><b>Главный вопрос этого шага</b><p>Что изменилось после изменения условий, какой объём помощи понадобился и удаётся ли использовать способ в похожей ситуации?</p></div>
+ ${planFactHTML()}
+ <div class="field">${fieldLabel("Результат задания")}<div class="radio-row">${["выполнено самостоятельно","выполнено с минимальной помощью","выполнено с частичной помощью","выполнено при значительной поддержке","не выполнено"].map(x=>radio("resultStatus",x,state.resultStatus)).join("")}</div>
+ <details class="help-disclosure"><summary>Как различать объём помощи?</summary><div class="disclosure-body"><p><b>Минимальная помощь</b> — отдельная краткая подсказка без выполнения действия за ребёнка.</p><p><b>Частичная помощь</b> — помощь на отдельных этапах последовательности.</p><p><b>Значительная поддержка</b> — совместное выполнение существенной части действия или постоянное сопровождение.</p></div></details></div>
+ <div class="two">
+  <div class="field">${fieldLabel("Что ребёнок выполнил самостоятельно?")}<textarea id="independentlyDone">${escapeHTML(state.independentlyDone)}</textarea></div>
+  <div class="field">${fieldLabel("Где и в чём проявилось затруднение?")}<textarea id="difficultyStage">${escapeHTML(state.difficultyStage)}</textarea></div>
+ </div>
+ <div class="field">${fieldLabel("Какая поддержка фактически потребовалась?")}<textarea id="supportNeeded">${escapeHTML(state.supportNeeded)}</textarea></div>
+ <div class="field">${fieldLabel("Что изменилось после изменения условий?")}<textarea id="conditionEffect" placeholder="Например: после сокращения инструкции ребёнок самостоятельно удержал первые два шага; после замены перетаскивания нажатием смог показать правильный ответ.">${escapeHTML(state.conditionEffect)}</textarea></div>
+ ${analysisRadio("interactionAccessible","Был ли выбранный способ взаимодействия доступен?",state.interactionAccessible,["Да","Частично","Нет","Не определено"])}
+ ${analysisRadio("answerAccessible","Был ли способ ответа доступен?",state.answerAccessible,["Да","Частично","Нет","Не определено"])}
+ ${analysisRadio("paceFit","Соответствовал ли темп возможностям выполнения?",state.paceFit,["Да","Частично","Нет","Не определено"])}
+ ${analysisRadio("resourceHelp","Помог ли информационный ресурс?",state.resourceHelp,["помог","частично помог","не повлиял","создал дополнительную трудность","ресурс не использовался"])}
+ ${analysisRadio("transferResult","Удалось ли применить освоенный способ в аналогичной ситуации?",state.transferResult,["Да","Частично","Нет","Не проверялось"])}
+ ${navButtons()}`;
+}
+function analysisRadio(name,title,current,arr){return `<div class="analysis-question"><h3>${title}</h3><div class="radio-row">${arr.map(x=>radio(name,x,current)).join("")}</div></div>`}
+
+function step10(){
+ return `${stepHeader(10,"Что делать дальше?","Выберите следующий педагогический шаг на основании наблюдений этого цикла.")}
+ <div class="decision-focus"><b>Итог цикла — не оценка ребёнка, а решение педагога</b><p>Что сохранить, что изменить и что проверить в следующей ситуации?</p></div>
+ <div class="options">${options.next.map(x=>checkbox("next",x,state.nextDecisions)).join("")}</div>
+ <div class="field">${fieldLabel("Свой вариант")}<textarea id="nextOther">${escapeHTML(state.nextOther)}</textarea></div>
+ <div class="alert ok"><b>Решение принимает специалист.</b> Приложение не формирует автоматический вердикт и не определяет вариант образовательной программы.</div>${navButtons()}`;
+}
+
+function bindStep(){
+ $$('[data-route-step]').forEach(n=>{const go=()=>{captureStep();currentStep=Number(n.dataset.routeStep);saveDraft();renderStep()};n.onclick=go;n.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}}});
+ $("#prevBtn").onclick=()=>{captureStep(); if(currentStep===0)showHome(); else{currentStep--;saveDraft();renderStep()}};
+ $("#nextBtn").onclick=nextStep;
+ $("#bottomNextBtn").onclick=nextStep;
+ $$('[data-tip-action]').forEach(b=>b.onclick=()=>{
+   const a=b.dataset.tipAction;
+   if(a==="accept")applyGuidance();
+   if(a==="change"){showToast("Вы можете изменить варианты вручную в текущем или следующем разделе.");const el=$(".options, .section-box");if(el)el.scrollIntoView({behavior:"smooth",block:"center"});}
+   if(a==="reject"){state.dismissedTips=state.dismissedTips||{};state.dismissedTips[currentStep]=true;saveDraft();const t=$("#contextTip");if(t)t.remove();}
+ });
+
+ if(currentStep===1){
+   const refreshStep2=()=>{
+     state.observedDifficulties=arr("observed");
+     state.difficultyReasons=state.observedDifficulties.slice();
+     state.needs=arr("needs");
+     saveDraft();
+     const host=$("#guidanceHost");
+     if(host){
+       host.innerHTML=guidanceHTML();
+       host.querySelectorAll('[data-tip-action]').forEach(b=>b.onclick=()=>{
+         const a=b.dataset.tipAction;
+         if(a==="accept")applyGuidance();
+         if(a==="change")showToast("Варианты можно изменить вручную на следующих этапах.");
+         if(a==="reject"){state.dismissedTips=state.dismissedTips||{};state.dismissedTips[currentStep]=true;saveDraft();host.innerHTML="";}
+       });
+     }
+     $$(".need-observation-card").forEach(card=>{
+       const any=[...card.querySelectorAll('input[name="observed"]')].some(x=>x.checked);
+       card.classList.toggle("selected",any);
+     });
+   };
+   $$('input[name="observed"],input[name="needs"]').forEach(x=>x.onchange=refreshStep2);
+ }
+ if(currentStep===2){
+   $$(".action-suggestion").forEach(b=>b.onclick=()=>{captureStep();addActionSuggestion(b.dataset.actionSuggestion)});
+   $("#addStepBtn").onclick=()=>{captureStep();state.actionSteps.push("");saveDraft();renderStep(true);};
+   $$(".remove-step").forEach(b=>b.onclick=()=>{captureStep();const i=Number(b.dataset.i); if(state.actionSteps.length>1)state.actionSteps.splice(i,1);saveDraft();renderStep(true);});
+   $$(".move-step").forEach(b=>b.onclick=()=>{captureStep();const i=Number(b.dataset.i),j=i+Number(b.dataset.dir);if(j>=0&&j<state.actionSteps.length){[state.actionSteps[i],state.actionSteps[j]]=[state.actionSteps[j],state.actionSteps[i]];saveDraft();renderStep(true);}});
+   let dragIndex=null;
+   $$(".seq-card").forEach(card=>{
+     card.ondragstart=e=>{captureStep();dragIndex=Number(card.dataset.seqIndex);card.classList.add("dragging");e.dataTransfer.effectAllowed="move"};
+     card.ondragend=()=>{$$(".seq-card").forEach(x=>x.classList.remove("dragging","drag-over"));dragIndex=null};
+     card.ondragover=e=>{e.preventDefault();card.classList.add("drag-over")};
+     card.ondragleave=()=>card.classList.remove("drag-over");
+     card.ondrop=e=>{e.preventDefault();const target=Number(card.dataset.seqIndex);if(dragIndex!==null&&target!==dragIndex){const [m]=state.actionSteps.splice(dragIndex,1);state.actionSteps.splice(target,0,m);saveDraft();renderStep(true);}};
+   });
+ }
+ if(currentStep===3){
+   $$(".condition-group").forEach(group=>{
+     const toggle=group.querySelector(".condition-toggle");
+     const body=group.querySelector(".condition-body");
+     const label=group.querySelector(".condition-toggle-label");
+     const counter=group.querySelector(".condition-count");
+     const optionInputs=[...group.querySelectorAll('.condition-body input[type="checkbox"]')];
+
+     const syncGroup=()=>{
+       const count=optionInputs.filter(x=>x.checked).length;
+       if(counter)counter.textContent=count;
+       group.classList.toggle("selected",count>0);
+     };
+
+     if(toggle){
+       toggle.onchange=()=>{
+         body?.classList.toggle("hidden",!toggle.checked);
+         if(label)label.textContent=toggle.checked?"Скрыть варианты":"Показать варианты";
+       };
+     }
+     optionInputs.forEach(x=>x.addEventListener("change",()=>{
+       syncGroup();
+       captureStep();
+     }));
+     syncGroup();
+   });
+ }
+ if(currentStep===4){
+   const levels=["полная помощь","совместное выполнение","визуальная/речевая опора","краткая подсказка","самостоятельное выполнение"];
+   $$('input[name="support"]').forEach(x=>x.onchange=()=>{const i=levels.indexOf(x.value);$("#supportCurrent").textContent=x.value;$("#supportNext").textContent=i>=0&&i<levels.length-1?levels[i+1]:"определяется после наблюдения";});
+ }
+ if(currentStep===8){
+   $$('input[name="resultStatus"]').forEach(x=>x.onchange=updatePlanFact);["supportNeeded","difficultyStage"].forEach(id=>$("#"+id)?.addEventListener("input",updatePlanFact));
+ }
+ if(currentStep===6){
+   $$('input[name="resourceNeed"]').forEach(x=>x.onchange=()=>{
+     $("#resourceYes").classList.toggle("hidden",x.value!=="ДА"||!x.checked);
+     $("#resourceNo").classList.toggle("hidden",x.value!=="НЕТ"||!x.checked);
+   });
+ }
+}
+
+function val(id){return $("#"+id)?.value ?? ""}
+function arr(name){return $$(`input[name="${name}"]:checked`).map(x=>x.value)}
+function rad(name){return $(`input[name="${name}"]:checked`)?.value || ""}
+
+function captureStep(){
+ if(currentStep===0){state.classLevel=val("classLevel");state.direction=val("direction");state.studentCode=val("studentCode");state.iomTask=val("iomTask")}
+ if(currentStep===1){state.observedDifficulties=arr("observed");state.needs=arr("needs");state.needOther=val("needOther");state.difficultyReasons=state.observedDifficulties.slice()}
+ if(currentStep===2){state.actionSteps=$$(".action-step").map(x=>x.value).filter((x,i,a)=>x.trim()||a.length===1);state.independentNow=val("independentNow");state.helpStage=val("helpStage")}
+ if(currentStep===3){state.existingSpecialConditions=val("existingSpecialConditions");state.materialConditions=arr("material");state.paceConditions=arr("pace");state.interactionModes=arr("interaction");state.answerModes=arr("answer")}
+ if(currentStep===4){state.supportLevel=rad("support");state.decreaseSupport=rad("decrease")}
+ if(currentStep===5){state.technologyFunctions=arr("technology");state.technologyOther=val("technologyOther")}
+ if(currentStep===6){
+   state.resourceNeed=rad("resourceNeed");state.resourceFunctions=arr("resourceFunctions");state.resourceName=val("resourceName");state.resourceDecision=rad("resourceDecision");
+   options.checklist.forEach((q,i)=>state.resourceChecklist[i]=rad("cl_"+i));
+ }
+ if(currentStep===7)state.executionNotes=val("executionNotes");
+ if(currentStep===8){
+   state.resultStatus=rad("resultStatus");state.independentlyDone=val("independentlyDone");state.difficultyStage=val("difficultyStage");state.supportNeeded=val("supportNeeded");
+   state.interactionAccessible=rad("interactionAccessible");state.answerAccessible=rad("answerAccessible");state.paceFit=rad("paceFit");state.resourceHelp=rad("resourceHelp");state.conditionEffect=val("conditionEffect");state.transferResult=rad("transferResult");
+ }
+ if(currentStep===9){state.nextDecisions=arr("next");state.nextOther=val("nextOther")}
+ saveDraft();
+}
+function nextStep(){
+ captureStep();
+ const missing=[];
+ if(currentStep===0 && !state.iomTask.trim())missing.push("задача ИОМ");
+ if(currentStep===1 && !(state.observedDifficulties||[]).length)missing.push("наблюдаемое затруднение");
+ if(currentStep===2 && !(state.actionSteps||[]).some(x=>x&&x.trim()))missing.push("способ действия");
+ if(missing.length){
+   const go=confirm(`Пока не заполнено: ${missing.join(", ")}.\n\nПродолжить всё равно?`);
+   if(!go)return;
+ }
+ if(currentStep<9){currentStep++;saveDraft();renderStep()}else{state.createdAt=state.createdAt||new Date().toISOString();saveDraft();showResult()}
+}
+
+function showHome(){
+ captureStepSafe();
+ $("#homeView").classList.remove("hidden");$("#workView").classList.add("hidden");$("#resultView").classList.add("hidden");$("#bottomNextWrap").classList.add("hidden");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function captureStepSafe(){try{if(!$("#workView").classList.contains("hidden"))captureStep()}catch(e){}}
+
+function showResult(){
+ $("#homeView").classList.add("hidden");$("#workView").classList.add("hidden");$("#resultView").classList.remove("hidden");$("#bottomNextWrap").classList.add("hidden");
+ const valOr=v=>v||"—";
+ const sections=[
+  {icon:"1",title:"Исходная задача и образовательная потребность",rows:[["Класс",state.classLevel],["Направление работы",state.direction],["Ученик / условное обозначение",state.studentCode],["Задача ИОМ",state.iomTask],["Наблюдаемое затруднение",join(state.observedDifficulties)],["Актуальная образовательная потребность",join(state.needs,state.needOther)]]},
+  {icon:"2",title:"Способ действия и условия выполнения",rows:[["Необходимый способ действия",state.actionSteps.filter(Boolean).map((x,i)=>`${i+1}. ${x}`).join("\n")],["Что уже выполняется самостоятельно",state.independentNow],["Где требуется помощь",state.helpStage],["Уже предусмотренные специальные условия",state.existingSpecialConditions],["Представление материала",join(state.materialConditions)],["Темп",join(state.paceConditions)],["Способ взаимодействия",join(state.interactionModes)],["Способ ответа",join(state.answerModes)]]},
+  {icon:"3",title:"Поддержка, технология и средства",rows:[["Педагогическая поддержка",state.supportLevel],["Можно ли уменьшить поддержку",state.decreaseSupport],["Образовательная/логопедическая технология",join(state.technologyFunctions,state.technologyOther)],["Информационный ресурс",resourceSummary()]]},
+  {icon:"4",title:"Выполнение и анализ результата",rows:[["Наблюдения при выполнении",state.executionNotes],["Результат",state.resultStatus],["Что выполнено самостоятельно",state.independentlyDone],["Где возникло затруднение",state.difficultyStage],["Какая помощь потребовалась",state.supportNeeded],["Что изменилось после изменения условий",state.conditionEffect],["Доступность взаимодействия",state.interactionAccessible],["Доступность способа ответа",state.answerAccessible],["Соответствие темпа",state.paceFit],["Роль ресурса",state.resourceHelp],["Перенос способа действия",state.transferResult]]},
+  {icon:"5",title:"Педагогическое решение и следующий шаг ИОМ",rows:[["Решение педагога / следующий шаг",join(state.nextDecisions,state.nextOther)]]}
+ ];
+ const routeVals=[
+  ["Задача",state.iomTask],["Потребность",join(state.needs,state.needOther)],["Действие",state.actionSteps.filter(Boolean).join(" → ")],
+  ["Условия",[...state.materialConditions,...state.paceConditions].slice(0,4).join("; ")],["Результат",state.resultStatus],["Следующий шаг",join(state.nextDecisions,state.nextOther)]
+ ];
+ $("#resultRoute").innerHTML=`<div class="route-summary"><h3>Карта реализации задачи ИОМ</h3>${routeMapHTML(9)}<div class="route-values">${routeVals.map(([k,v])=>`<div class="route-value"><small>${escapeHTML(k)}</small><b>${escapeHTML(valOr(v))}</b></div>`).join("")}</div></div>`;
+ $("#resultGrid").innerHTML=`<div class="result-hero"><div class="result-hero-main"><small>Рабочая карточка</small><h3>${escapeHTML(state.iomTask||"Задача ИОМ не указана")}</h3><p>Итог отражает профессиональный выбор специалиста и может быть отредактирован перед сохранением.</p></div><div class="result-hero-side"><div><span>Класс</span><b>${escapeHTML(valOr(state.classLevel))}</b></div><div><span>Направление</span><b>${escapeHTML(valOr(state.direction))}</b></div><div><span>Результат</span><b>${escapeHTML(valOr(state.resultStatus))}</b></div></div></div><div class="result-sections">${sections.map(sec=>`<section class="result-section"><div class="result-section-head"><div class="result-section-icon">${sec.icon}</div><h3>${sec.title}</h3></div><div class="result-section-body">${sec.rows.map(([k,v],i)=>`<div class="result-item ${(v&&String(v).length>110)||k.includes("Задача")||k.includes("Потребность")||k.includes("Действие")||k.includes("Решение")?"result-wide":""}"><b>${escapeHTML(k)}</b><span>${escapeHTML(valOr(v))}</span></div>`).join("")}</div></section>`).join("")}</div>`;
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function join(a=[],extra=""){return [...(a||[]),...(extra?[extra]:[])].filter(Boolean).join("; ")}
+function resourceSummary(){
+ if(state.resourceNeed==="НЕТ")return "Информационный ресурс не требуется";
+ if(state.resourceNeed==="НЕ УВЕРЕН")return "Необходимость информационного ресурса пока не определена";
+ if(state.resourceNeed==="ДА")return `Функция: ${join(state.resourceFunctions)||"не указана"}${state.resourceName?"; ресурс: "+state.resourceName:""}${state.resourceDecision?"; решение: "+state.resourceDecision:""}`;
+ return "Не определено";
+}
+
+function startNew(reset=true){
+ if(reset){state=clone(emptyState);currentStep=0;saveDraft()}
+ renderStep();
+}
+function nextCycle(){
+ const prevTask=state.iomTask, prevCode=state.studentCode, prevClass=state.classLevel, prevDir=state.direction;
+ const group=state.cycleGroupId||`grp_${Date.now()}`;const num=(state.cycleNumber||1)+1;
+ state=clone(emptyState); state.iomTask=prevTask;state.studentCode=prevCode;state.classLevel=prevClass;state.direction=prevDir;state.cycleGroupId=group;state.cycleNumber=num;state.savedCycleId=null;currentStep=0;saveDraft();renderStep();
+}
+
+function getCycles(){try{return JSON.parse(localStorage.getItem("iom_cycles")||"[]")}catch(e){return[]}}
+function saveCycle(asNew=false){
+ const cycles=getCycles();
+ if(!state.cycleGroupId)state.cycleGroupId=`grp_${Date.now()}`;
+ if(asNew || !state.savedCycleId){
+   const same=cycles.filter(c=>c.cycleGroupId===state.cycleGroupId);
+   if(asNew && state.savedCycleId){
+     const maxNum=same.reduce((m,c)=>Math.max(m,Number(c.cycleNumber)||0),0);
+     state.cycleNumber=maxNum+1;
+     state.parentCycleId=state.savedCycleId;
+     state.savedCycleId=null;
+   }else if(!state.cycleNumber){
+     state.cycleNumber=same.length+1;
+   }
+   const id=Date.now();
+   state.savedCycleId=id;
+   const copy=clone(state);copy.id=id;copy.savedAt=new Date().toISOString();
+   cycles.unshift(copy);
+   localStorage.setItem("iom_cycles",JSON.stringify(cycles));
+   saveDraft();
+   showToast(`Рабочий цикл ${copy.cycleNumber||""} сохранён как новая запись.`);
+ }else{
+   const idx=cycles.findIndex(c=>c.id===state.savedCycleId || c.savedCycleId===state.savedCycleId);
+   if(idx>=0){
+     const prev=cycles[idx];
+     const copy=clone(state);copy.id=prev.id;copy.savedCycleId=prev.id;copy.savedAt=new Date().toISOString();
+     cycles[idx]=copy;
+     localStorage.setItem("iom_cycles",JSON.stringify(cycles));
+     saveDraft();
+     showToast("Изменения сохранены в текущем цикле.");
+   }else{
+     state.savedCycleId=null;
+     saveCycle(true);
+   }
+ }
+}
+function cycleMatches(c,q){if(!q)return true;const hay=[c.iomTask,c.classLevel,c.direction,c.resultStatus,(c.needs||[]).join(" ")].join(" ").toLowerCase();return hay.includes(q.toLowerCase())}
+function cycleGroupKey(c){return c.cycleGroupId||[c.studentCode||"—",c.iomTask||"Без задачи",c.classLevel||""].join("|")}
+function renderHistory(all){
+ const host=$("#cycleHistory");if(!host)return;
+ if(!all.length){host.innerHTML='<div class="history-empty">История появится после сохранения первого рабочего цикла.</div>';return;}
+ const groups={};all.slice().reverse().forEach(c=>{const k=cycleGroupKey(c);(groups[k]||(groups[k]=[])).push(c)});
+ const lanes=Object.values(groups).slice(0,8).map(arr=>{arr.sort((a,b)=>new Date(a.savedAt)-new Date(b.savedAt));const first=arr[0];return `<div class="history-lane"><div class="history-lane-title">${escapeHTML(first.iomTask||"Задача ИОМ")}${first.studentCode?` · ${escapeHTML(first.studentCode)}`:""}</div><div class="history-track">${arr.map((c,i)=>`<div class="history-node ${i===arr.length-1?"current":""}"><small>Цикл ${escapeHTML(c.cycleNumber||i+1)} · ${new Date(c.savedAt).toLocaleDateString("ru-RU")}</small><b>${escapeHTML(c.resultStatus||"результат не заполнен")}</b><p>${escapeHTML((c.nextDecisions||[]).slice(0,2).join("; ")||c.nextOther||"Следующий шаг ещё не зафиксирован")}</p></div>`).join("")}</div></div>`}).join("");
+ host.innerHTML=`<div class="cycle-history-head"><h3>История решений по ИОМ</h3><span class="cycle-badge">${Object.keys(groups).length} маршрутов</span></div><div class="history-lanes">${lanes}</div>`;
+}
+function renderCycleDashboard(){
+ const all=getCycles(), q=$("#cycleSearch")?.value||"", cycles=all.filter(c=>cycleMatches(c,q));
+ renderHistory(all);
+ const completed=all.filter(c=>c.resultStatus).length, classes=new Set(all.map(c=>c.classLevel).filter(Boolean)).size;
+ $("#cycleStats").innerHTML=`<div class="stat-card"><strong>${all.length}</strong><span>сохранённых циклов</span></div><div class="stat-card"><strong>${completed}</strong><span>с результатом</span></div><div class="stat-card"><strong>${classes}</strong><span>классов в работе</span></div>`;
+ const wrap=$("#savedCycles");
+ if(!cycles.length)wrap.innerHTML='<div class="alert info">По заданным условиям рабочие циклы не найдены.</div>';
+ else wrap.innerHTML=cycles.map(c=>{const i=all.findIndex(x=>x.id===c.id);return `<div class="saved-cycle"><div class="meta"><b>${escapeHTML(c.iomTask||"Без названия")}</b><span class="cycle-badge">цикл ${escapeHTML(c.cycleNumber||1)}</span><span class="cycle-badge">${c.resultStatus?"завершён":"черновик"}</span><br><small>${escapeHTML(c.classLevel?c.classLevel+" класс":"Класс не указан")} · ${escapeHTML(c.direction||"направление не указано")} · ${new Date(c.savedAt).toLocaleString("ru-RU")}</small></div><div class="cycle-actions"><button class="btn load-cycle" data-i="${i}">Карточка</button><button class="btn next-saved-cycle" data-i="${i}">Следующий цикл</button><button class="btn danger delete-cycle" data-i="${i}">Удалить</button></div></div>`}).join("");
+ $$(".load-cycle").forEach(b=>b.onclick=()=>{const c=all[Number(b.dataset.i)];state=normalizeState(clone(c));state.savedCycleId=c.id||c.savedCycleId||null;delete state.id;delete state.savedAt;currentStep=0;saveDraft();closeModal("cyclesModal");showResult()});
+ $$(".next-saved-cycle").forEach(b=>b.onclick=()=>{const c=all[Number(b.dataset.i)];state=clone(emptyState);state.classLevel=c.classLevel||"";state.direction=c.direction||"";state.studentCode=c.studentCode||"";state.iomTask=c.iomTask||"";state.cycleGroupId=c.cycleGroupId||cycleGroupKey(c);state.cycleNumber=(c.cycleNumber||1)+1;state.parentCycleId=c.id||null;currentStep=0;saveDraft();closeModal("cyclesModal");renderStep();showToast(`Создан цикл ${state.cycleNumber} той же задачи ИОМ.`)});
+ $$(".delete-cycle").forEach(b=>b.onclick=()=>{if(confirm("Удалить сохранённый цикл?")){all.splice(Number(b.dataset.i),1);localStorage.setItem("iom_cycles",JSON.stringify(all));renderCycleDashboard()}});
+}
+function openCycles(){openModal("cyclesModal");renderCycleDashboard();setTimeout(()=>$("#cycleSearch")?.focus(),50)}
+function exportBackup(){
+ const data={app:"ИОМ-Навигатор",version:"5.1",exportedAt:new Date().toISOString(),draft:loadDraft(),currentStep:Number(localStorage.getItem("iom_current_step")||0),cycles:getCycles(),fontLevel:Number(localStorage.getItem("iom_font_level")||0)};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`IOM_Navigator_v5_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);showToast("Резервная копия сохранена.");
+}
+function isValidCycleRecord(c){
+ return c && typeof c==="object"
+   && (!("classLevel" in c) || typeof c.classLevel==="string")
+   && (!("iomTask" in c) || typeof c.iomTask==="string")
+   && (!("actionSteps" in c) || Array.isArray(c.actionSteps))
+   && (!("needs" in c) || Array.isArray(c.needs));
+}
+async function importBackup(file){
+ try{
+   const data=JSON.parse(await file.text());
+   if(data.app!=="ИОМ-Навигатор" || !Array.isArray(data.cycles) || !data.cycles.every(isValidCycleRecord)) throw new Error("format");
+   const major=parseInt(String(data.version||"0").split(".")[0],10);
+   if(!Number.isFinite(major) || major<4 || major>5) throw new Error("version");
+   if(data.draft && !isValidCycleRecord(data.draft)) throw new Error("draft");
+   if(!confirm(`Восстановление заменит текущий черновик и список сохранённых циклов. Версия резервной копии: ${data.version||"не указана"}. Продолжить?`))return;
+   localStorage.setItem("iom_cycles",JSON.stringify((data.cycles||[]).map(normalizeState)));
+   if(data.draft)localStorage.setItem("iom_draft",JSON.stringify(normalizeState(data.draft)));else localStorage.removeItem("iom_draft");
+   localStorage.setItem("iom_current_step",String(Math.max(0,Math.min(9,Number(data.currentStep)||0))));
+   if(Number.isFinite(data.fontLevel))localStorage.setItem("iom_font_level",String(Math.max(0,Math.min(2,data.fontLevel))));
+   state=loadDraft()||clone(emptyState);
+   currentStep=Number(localStorage.getItem("iom_current_step")||0);
+   renderCycleDashboard();
+   showToast("Данные восстановлены и проверены.");
+ }catch(e){
+   alert("Не удалось восстановить данные: резервная копия имеет неподдерживаемую версию или повреждённую структуру.");
+ }
+}
+
+const cases=[
+ {title:"1 класс · Математика · Сравнение количеств",classLevel:"1 класс",subject:"математика",need:"структурирование",context:"общая педагогическая ситуация",tags:["1 класс","математика","структурирование"],situation:"Ребёнок определяет ответ по внешнему виду групп предметов и не удерживает последовательность сравнения.",needText:"Структурирование последовательности действий и уменьшение объёма одновременно представленной информации.",task:"Формирование способа сравнения количеств",steps:["посчитать первую группу","посчитать вторую группу","сравнить результаты","выбрать знак"],material:["последовательное представление","короткая инструкция","визуальная схема"],pace:["индивидуальный темп"],technology:["поэтапная организация деятельности","визуальная поддержка"]},
+ {title:"2 класс · Русский язык · Многошаговая инструкция",classLevel:"2 класс",subject:"русский язык",need:"инструкция",context:"может встречаться при разных образовательных потребностях",tags:["2 класс","русский язык","инструкция"],situation:"Обучающийся начинает задание, но после первого действия теряет второй и третий шаг инструкции.",needText:"Короткая последовательная инструкция и внешняя опора для удержания порядка действий.",task:"Освоение последовательного выполнения языкового задания",steps:["прочитать короткую инструкцию","выполнить первый шаг","свериться со схемой","выполнить следующий шаг","проверить результат"],material:["последовательное представление","короткая инструкция","визуальная схема"],pace:[],technology:["поэтапная организация деятельности"]},
+ {title:"3 класс · Математика · Доступный способ ответа",classLevel:"3 класс",subject:"математика",need:"доступность",context:"актуально при двигательных трудностях, в том числе при НОДА",tags:["3 класс","математика","доступность","НОДА — контекст"],situation:"Содержание задания понятно, но перетаскивание небольшого элемента на экране физически затруднено.",needText:"Доступный физический и технический способ представления ответа без автоматического упрощения содержания.",task:"Сохранение содержательной математической задачи при изменении способа ответа",steps:["понять условие","выполнить вычисление","выбрать ответ","представить результат доступным способом"],material:["увеличение изображения"],pace:["индивидуальный темп"],interaction:["нажатие","указание","карточка","устный ответ"],answer:["выбор варианта","карточка","устный"],technology:[]},
+ {title:"4 класс · Литературное чтение · Самопроверка",classLevel:"4 класс",subject:"литературное чтение",need:"самопроверка",context:"общая педагогическая ситуация",tags:["4 класс","чтение","самопроверка"],situation:"После выполнения задания ученик редко возвращается к условию и не замечает пропущенную часть ответа.",needText:"Освоение понятного алгоритма самопроверки и постепенный переход к самостоятельному контролю.",task:"Формирование способа самопроверки ответа по тексту",steps:["прочитать вопрос","найти опору в тексте","сформулировать ответ","сверить ответ с вопросом"],material:["визуальная схема"],pace:[],technology:["организация самопроверки"]},
+ {title:"1 класс · Коррекционно-развивающая работа · Индивидуальный темп",classLevel:"1 класс",subject:"коррекционно-развивающая работа",need:"темп",context:"может быть актуально при ЗПР и других индивидуальных потребностях",tags:["1 класс","темп","ЗПР — контекст"],situation:"При длительном непрерывном выполнении снижается точность, хотя отдельные действия доступны.",needText:"Дозирование нагрузки, индивидуальный темп и возможность паузы.",task:"Сохранение доступного способа действия при регулировании темпа",steps:["получить короткую задачу","выполнить один этап","сделать паузу при необходимости","продолжить","проверить результат"],material:["уменьшение объёма одновременно представленной информации"],pace:["индивидуальный темп","возможность паузы","дополнительное время"],technology:["поэтапная организация деятельности"]},
+ {title:"2 класс · Логопедическая работа · Речевая опора",classLevel:"2 класс",subject:"логопедическая работа",need:"речевая опора",context:"логопедическая работа",tags:["2 класс","логопедия","речевая опора"],situation:"Ребёнок понимает смысл изображения, но затрудняется последовательно развернуть речевое высказывание.",needText:"Речевая схема и постепенное уменьшение внешней опоры.",task:"Формирование последовательного речевого высказывания",steps:["назвать ситуацию","выделить главное действие","добавить признак или обстоятельство","произнести полное высказывание"],material:["речевая опора","визуальная схема"],pace:["индивидуальный темп"],technology:["упражнения на формирование речевого действия"]},
+ {title:"3 класс · Окружающий мир · Объём информации",classLevel:"3 класс",subject:"окружающий мир",need:"визуальная опора",context:"общая педагогическая ситуация",tags:["3 класс","окружающий мир","визуальная опора"],situation:"На насыщенной странице ученик затрудняется выделить сведения, необходимые для ответа на конкретный вопрос.",needText:"Визуальное выделение существенного и регулирование объёма одновременно представленной информации.",task:"Поиск существенной информации для ответа на вопрос",steps:["прочитать вопрос","выделить ключевое слово","найти соответствующий фрагмент","сформулировать ответ"],material:["визуальное выделение существенного","уменьшение объёма одновременно представленной информации"],pace:[],technology:["визуальная поддержка"]},
+ {title:"4 класс · Русский язык · Перенос способа действия",classLevel:"4 класс",subject:"русский язык",need:"структурирование",context:"общая педагогическая ситуация",tags:["4 класс","русский язык","перенос"],situation:"Ученик выполняет знакомое задание по образцу, но затрудняется применить тот же алгоритм в похожей формулировке.",needText:"Осознанное выделение шагов алгоритма и проверка переноса в аналогичной ситуации.",task:"Перенос освоенного способа языкового анализа",steps:["вспомнить алгоритм","соотнести новый пример с шагами","выполнить анализ","проверить по алгоритму"],material:["визуальная схема"],pace:[],technology:["моделирование","организация самопроверки"]}
+];
+function renderLibrary(){
+ const q=($("#libSearch")?.value||"").toLowerCase(), cl=$("#libClass")?.value||"", sub=$("#libSubject")?.value||"", need=$("#libNeed")?.value||"";
+ const filtered=cases.filter(c=>(!q||[c.title,c.situation,c.needText,c.context,...c.tags].join(" ").toLowerCase().includes(q))&&(!cl||c.classLevel===cl)&&(!sub||c.subject===sub)&&(!need||c.need===need));
+ $("#libraryGrid").innerHTML=filtered.length?filtered.map((c,i)=>{const real=cases.indexOf(c);return `<article class="case"><h3>${escapeHTML(c.title)}</h3><div>${c.tags.map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join("")}</div><p>${escapeHTML(c.situation)}</p><div class="case-structure"><div class="case-line"><b>Методическая гипотеза о потребности:</b> ${escapeHTML(c.needText)}</div><div class="case-line"><b>Задача:</b> ${escapeHTML(c.task)}</div><div class="case-line"><b>Способ действия:</b> ${escapeHTML(c.steps.join(" → "))}</div><div class="case-line"><b>Контекст:</b> ${escapeHTML(c.context)}</div></div><button class="btn soft use-case" data-i="${real}">Использовать как основу цикла</button></article>`}).join(""):'<div class="alert info library-empty">Подходящих методических ситуаций по выбранным фильтрам нет.</div>';
+ $$(".use-case").forEach(b=>b.onclick=()=>useCase(Number(b.dataset.i)));
+}
+function useCase(i){
+ const c=cases[i];
+ const needMap={
+  "структурирование":["во внешней организации и удержании последовательности действий","в регулировании объёма одновременно представленной информации"],
+  "инструкция":["в короткой и последовательной инструкции","во внешней организации и удержании последовательности действий"],
+  "доступность":["в доступном физическом и техническом способе взаимодействия","в доступном способе представления ответа"],
+  "самопроверка":["в организации самопроверки"],
+  "темп":["в индивидуальном темпе и/или дополнительном времени","в возможности паузы и дозировании непрерывной нагрузки"],
+  "речевая опора":["в речевой опоре для организации действия"],
+  "визуальная опора":["в регулировании объёма одновременно представленной информации","в визуальной опоре для организации действия"]
+ };
+ const observationMap={
+  "структурирование":["не удерживает последовательность действий","теряется при большом объёме одновременно представленной информации"],
+  "инструкция":["затрудняется понять или удержать многошаговую инструкцию"],
+  "доступность":["понимает содержание, но физически затрудняется выполнить предусмотренный способ ответа"],
+  "самопроверка":["затрудняется самостоятельно проверить результат"],
+  "темп":["не успевает выполнить действие в предложенном темпе","быстро утомляется при непрерывной деятельности"],
+  "речевая опора":["затрудняется понять или удержать многошаговую инструкцию"],
+  "визуальная опора":["теряется при большом объёме одновременно представленной информации"]
+ };
+ state=clone(emptyState);
+ state.classLevel=c.classLevel.replace(" класс","");
+ state.direction=c.subject;
+ state.iomTask=c.task;
+ state.observedDifficulties=clone(observationMap[c.need]||[]);
+ state.difficultyReasons=state.observedDifficulties.slice();
+ state.needs=clone(needMap[c.need]||[]);
+ state.needOther=c.needText;
+ state.actionSteps=clone(c.steps);
+ state.materialConditions=clone(c.material||[]);
+ state.paceConditions=clone(c.pace||[]);
+ state.interactionModes=clone(c.interaction||[]);
+ state.answerModes=clone(c.answer||[]);
+ state.technologyFunctions=clone(c.technology||[]);
+ currentStep=0;
+ saveDraft();
+ closeModal("libraryModal");
+ renderStep();
+ showToast("Методическая ситуация перенесена как редактируемая основа рабочего цикла.");
+}
+
+const glossary=[
+ ["ИОМ","Индивидуальный образовательный маршрут — способ организации последовательных педагогических решений для достижения конкретных образовательных задач. Простыми словами: маршрут, по которому педагог вместе с ребёнком движется от текущей задачи к следующему шагу."],
+ ["Индивидуальная образовательная потребность","Конкретное условие или вид поддержки, значимый для освоения действия данным ребёнком. Простыми словами: что именно сейчас помогает ребёнку учиться успешнее."],
+ ["Необходимый способ действия","Последовательность действий, которую требуется освоить для решения задачи. Например: посчитать первую группу → вторую → сравнить → выбрать знак."],
+ ["Способ представления материала","То, как педагог показывает информацию: последовательно, визуально, с выделением существенного, небольшими порциями и т. п."],
+ ["Доступность взаимодействия","Насколько физически и технически ребёнок может выполнить требуемое действие: нажать, написать, перетащить, указать, выбрать."],
+ ["Альтернативный способ ответа","Другой доступный способ показать результат без изменения смысла учебной задачи: например, устный ответ вместо перетаскивания."],
+ ["Педагогическая поддержка","Объём помощи специалиста: от совместного выполнения до краткой подсказки и самостоятельной работы."],
+ ["Обратная связь","Информация, которая помогает понять, что получилось, где возникло затруднение и что изменить дальше."],
+ ["Перенос способа действия","Использование освоенного способа в похожей, но новой ситуации."]
+];
+function renderGlossary(){
+ $("#glossaryList").innerHTML=glossary.map(([a,b])=>`<details><summary>${escapeHTML(a)}</summary><p>${escapeHTML(b)}</p></details>`).join("");
+}
+
+function loadDemo(){
+ state=clone(emptyState);
+ Object.assign(state,{
+  classLevel:"1",direction:"математика",studentCode:"Ученик А",iomTask:"Формирование способа сравнения количеств",
+  needs:["ребёнку трудно удерживать последовательность действий","требуется более последовательное представление материала","необходима визуальная опора"],
+  difficultyReasons:["потерял последовательность действий","одновременно представлено слишком много информации"],
+  actionSteps:["посчитать первую группу","посчитать вторую группу","сравнить результаты","выбрать знак"],
+  independentNow:"Считает предметы в небольшой группе.",helpStage:"Сравнение результатов и выбор знака.",
+  materialConditions:["последовательное представление","короткая инструкция","визуальная схема","уменьшение объёма одновременно представленной информации"],
+  paceConditions:["индивидуальный темп"],interactionModes:["выбор","указание"],answerModes:["выбор варианта","карточка"],
+  supportLevel:"визуальная/речевая опора",decreaseSupport:"Требуется дополнительное наблюдение",
+  technologyFunctions:["поэтапная организация деятельности","визуальная поддержка"],
+  resourceNeed:"НЕ УВЕРЕН",executionNotes:"После предъявления визуальной схемы удержал последовательность действий лучше.",
+  resultStatus:"выполнено с минимальной помощью",independentlyDone:"Посчитал обе группы и сравнил результаты.",difficultyStage:"Потребовалась краткая подсказка при выборе знака.",supportNeeded:"Визуальная схема и одна краткая подсказка.",
+  interactionAccessible:"Да",answerAccessible:"Да",paceFit:"Да",resourceHelp:"ресурс не использовался",
+  nextDecisions:["сохранить условия","уменьшить педагогическую поддержку","проверить перенос способа действия в аналогичной ситуации"]
+ });
+ currentStep=0;saveDraft();renderStep();
+}
+
+let modalReturnFocus=null;
+function openModal(id){
+ const m=$("#"+id);if(!m)return;
+ modalReturnFocus=document.activeElement;
+ m.classList.remove("hidden");
+ requestAnimationFrame(()=>{const f=m.querySelector("button,input,select,textarea,[tabindex]:not([tabindex='-1'])");f?.focus()});
+}
+function closeModal(id){
+ const m=$("#"+id);if(!m)return;
+ m.classList.add("hidden");
+ if(modalReturnFocus&&typeof modalReturnFocus.focus==="function")modalReturnFocus.focus();
+ modalReturnFocus=null;
+}
+document.addEventListener("keydown",e=>{
+ const open=[...$$(".modal:not(.hidden)")].pop();
+ if(!open)return;
+ if(e.key==="Escape"){e.preventDefault();closeModal(open.id);return;}
+ if(e.key==="Tab"){
+   const focusables=[...open.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[href],[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);
+   if(!focusables.length)return;
+   const first=focusables[0],last=focusables[focusables.length-1];
+   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ }
+});
+
+function exportWord(){
+ showResult();
+ const body=`<html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:12pt;color:#222}h1{font-size:18pt}.result-section{margin:16px 0;border:1px solid #ccc;padding:10px}.result-section-head h3{margin:0 0 8px}.result-item{margin:8px 0}.result-item b{display:block;font-size:10pt}.iom-route,.route-values,.toolbar,.result-hero{display:none}
+
+/* ===== v4.2 — фокус, читаемость и прогрессивное раскрытие ===== */
+:root{--font:18px;--muted:#354552;--line:#cfdbe3;--line-strong:#aebfca}
+body{color:#111c26;line-height:1.64}
+.step-card{max-width:1040px;margin:0 auto;padding:34px 36px}
+.step-title{margin-bottom:20px}.step-title h2{font-size:1.82rem;line-height:1.2;color:#10202b}.step-title p{font-size:1.03rem;color:#314553;max-width:850px}
+label.field-label{font-size:1.05rem;color:#152834}.hint{font-size:.97rem;color:#3a4e5b}
+.option{font-size:1rem;color:#172a35;min-height:50px;align-items:center}.option input{flex:0 0 auto}
+.radio-pill span{font-size:1rem;min-height:46px;display:inline-flex;align-items:center;justify-content:center}
+.alert{font-size:1rem}.alert.info{color:#244d60}.alert.ok{color:#245c4b}
+.step-nav button{font-size:.99rem;color:#31434f}.progress-head span{color:#2f424e}
+.iom-route-node small{font-size:.82rem;color:#3c4e5a}.iom-route-node b{font-size:.97rem}.iom-route-node .route-preview{font-size:.86rem;color:#465a67}
+.need-visual-card b{font-size:1rem;color:#132934}.need-visual-card small{font-size:.92rem;color:#354b58}.reason-group h4{font-size:1.03rem;color:#172a35}.reason-group p{font-size:.93rem;color:#3c505c}.reason-count{font-size:.88rem}
+.visual-callout p,.tip-card p,.support-next-note,.pf-item,.history-node p{color:#354b58}
+
+/* Главные вопросы */
+.decision-focus{border:2px solid #c7dedf;background:linear-gradient(135deg,#eff9f7,#ffffff);border-radius:18px;padding:16px 18px;margin:14px 0 18px}
+.decision-focus b{display:block;color:var(--primary3);font-size:1.06rem;margin-bottom:3px}.decision-focus p{margin:0;color:#314b58;font-size:.98rem}
+
+/* Пояснения не конкурируют с основным действием */
+.help-disclosure{border:1px solid #cfdde4;border-radius:15px;background:#f9fbfc;margin:12px 0;overflow:hidden}
+.help-disclosure>summary{list-style:none;cursor:pointer;padding:13px 15px;font-weight:780;color:#24424f;display:flex;align-items:center;gap:9px;font-size:.98rem}
+.help-disclosure>summary::-webkit-details-marker{display:none}.help-disclosure>summary:before{content:"?";width:27px;height:27px;border-radius:9px;background:#e6f2f3;color:var(--primary);display:grid;place-items:center;font-weight:900;flex:0 0 auto}
+.help-disclosure>summary:after{content:"+";margin-left:auto;color:var(--primary);font-size:1.15rem}.help-disclosure[open]>summary:after{content:"−"}
+.disclosure-body{padding:0 15px 15px;color:#2f4653}.disclosure-body p{margin:4px 0 10px}.disclosure-body ul{margin:8px 0;padding-left:22px}
+
+/* Способ действия: подсказки видны, теория свернута */
+.action-helper{padding:17px 18px;background:linear-gradient(145deg,#f2faf9,#fbfdfe)}
+.action-helper-head{margin-bottom:10px}.action-helper h3{font-size:1.16rem}.action-helper p{font-size:1rem;color:#304855}
+.action-suggestions-title{font-size:1rem;margin-top:12px}.action-suggestion{font-size:.98rem;padding:11px 14px;color:#173f49}
+.action-helper .help-disclosure{margin-top:14px;background:#fff}
+.action-rule{font-size:.96rem;color:#2a414e}.action-example>div{font-size:.96rem}.action-helper-note{font-size:.94rem;color:#384e5b}
+.sequence-hint{font-size:.95rem;color:#344a57}.seq-card input{font-size:1.02rem}
+
+/* Условия: четыре смысловые группы вместо длинной стены чекбоксов */
+.condition-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.condition-group{border:1px solid var(--line);border-radius:17px;background:#fff;overflow:hidden;transition:.18s}.condition-group[open]{border-color:#9fc8ca;box-shadow:0 9px 24px rgba(25,53,73,.06)}.condition-group.selected{background:#fbfefd;border-color:#9fc8ca}
+.condition-group summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;padding:15px}.condition-group summary::-webkit-details-marker{display:none}
+.condition-icon{width:38px;height:38px;border-radius:12px;background:#eaf4f4;color:var(--primary);display:grid;place-items:center;font-weight:900}.condition-group h3{margin:0;font-size:1.03rem;color:#172b36}.condition-group summary p{margin:2px 0 0;color:#3c515e;font-size:.91rem}.condition-count{min-width:30px;height:30px;border-radius:999px;background:#edf4f6;display:grid;place-items:center;font-size:.88rem;font-weight:800;color:#38505d}.condition-group.selected .condition-count{background:var(--accent);color:var(--primary2)}
+.condition-body{padding:0 14px 14px}.condition-body .options{gap:8px}
+
+/* Ресурс: компактная карта оценки */
+.resource-checklist{display:grid;gap:9px;margin:12px 0}.resource-check-row{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 13px;display:grid;grid-template-columns:minmax(230px,1fr) auto;gap:14px;align-items:center}.resource-check-row h4{margin:0;font-size:.98rem;color:#172a35}.resource-check-row .radio-row{justify-content:flex-end}.resource-check-row .radio-pill span{padding:8px 11px;min-height:39px;font-size:.91rem}
+
+/* Анализ: вопрос слева, ответ справа */
+.analysis-question{border:1px solid var(--line);border-radius:15px;background:#fff;padding:13px 14px;margin:10px 0;display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:15px;align-items:center}.analysis-question h3{margin:0;font-size:1rem;color:#172a35}.analysis-question .radio-row{justify-content:flex-end}
+
+/* Итог и мелкие служебные подписи */
+.result-item b{font-size:.94rem;color:#1b5660}.result-item span{font-size:1.02rem;color:#172a35}.footer-note{font-size:.95rem;color:#384b57}
+
+@media(max-width:900px){.condition-grid{grid-template-columns:1fr}.resource-check-row,.analysis-question{grid-template-columns:1fr}.resource-check-row .radio-row,.analysis-question .radio-row{justify-content:flex-start}}
+@media(max-width:680px){
+ :root{--font:18px}.step-card{padding:22px 16px}.step-title h2{font-size:1.52rem}.step-title p{font-size:1rem}
+ .decision-focus{padding:14px}.help-disclosure>summary{padding:12px 13px}.action-helper{padding:15px}
+ .resource-check-row .radio-row,.analysis-question .radio-row{grid-template-columns:1fr 1fr}.resource-check-row .radio-pill span,.analysis-question .radio-pill span{width:100%}
+}
+
+</style></head><body><h1>Рабочая карточка реализации задачи ИОМ</h1>${$("#resultGrid").innerHTML}<div style="text-align:center;padding:16px;color:#465564;font-size:14px">© 2026 Ядрешникова О. В. Авторская разработка «ИОМ-Навигатор».</div>
+</body></html>`;
+ const blob=new Blob(["\ufeff",body],{type:"application/msword"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ИОМ_рабочая_карточка.doc";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function applyFont(){document.documentElement.style.setProperty("--font",(18+fontLevel*2)+"px")}
+let toastTimer=null;function showToast(msg){const t=$("#toast");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2800)}
+
+$("#startBtn").onclick=()=>startNew(true);
+$("#continueBtn").onclick=()=>{state=loadDraft()||clone(emptyState);currentStep=Number(localStorage.getItem("iom_current_step")||0);renderStep()};
+$("#demoBtn").onclick=loadDemo;
+$("#homeBtn").onclick=showHome;
+$("#cyclesBtn").onclick=openCycles;
+$("#libraryBtn").onclick=()=>{renderLibrary();openModal("libraryModal")};
+$("#glossaryBtn").onclick=()=>openModal("glossaryModal");
+$("#fontBtn").onclick=()=>{fontLevel=(fontLevel+1)%3;localStorage.setItem("iom_font_level",fontLevel);applyFont()};
+
+let exportMode="map";
+
+function safeFilePart(s){
+ return String(s||"ИОМ").replace(/[\\/:*?"<>|]+/g,"_").replace(/\s+/g," ").trim().slice(0,60)||"ИОМ";
+}
+function exportBaseName(kind){
+ const who=state.studentCode?`_${safeFilePart(state.studentCode)}`:"";
+ const task=state.iomTask?`_${safeFilePart(state.iomTask)}`:"";
+ return `${kind==="map"?"Карта_ИОМ":"Итоговая_карточка_ИОМ"}${who}${task}`;
+}
+function openExport(mode){
+ exportMode=mode;
+ $("#exportModalTitle").textContent=mode==="map"?"Сохранить карту ИОМ":"Сохранить итоговую карточку";
+ $("#exportModalHint").textContent=mode==="map"?"Карта содержит логику рабочего цикла без лишних элементов интерфейса.":"Карточка содержит заполненные результаты текущего цикла.";
+ openModal("exportModal");
+}
+function downloadBlob(blob,name){
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function mapExportData(){
+ return [
+  ["Задача ИОМ",state.iomTask||"—"],
+  ["Наблюдаемое затруднение",join(state.observedDifficulties)||"—"],
+  ["Образовательная потребность",join(state.needs,state.needOther)||"—"],
+  ["Способ действия",(state.actionSteps||[]).filter(Boolean).join(" → ")||"—"],
+  ["Условия",[state.existingSpecialConditions,join(state.materialConditions),join(state.paceConditions),join(state.interactionModes),join(state.answerModes)].filter(Boolean).join("; ")||"—"],
+  ["Педагогическая поддержка",state.supportLevel||"—"],
+  ["Технология",join(state.technologyFunctions,state.technologyOther)||"—"],
+  ["Информационный ресурс",state.resourceNeed==="Нет"?"Не требуется":(state.resourceName||join(state.resourceFunctions)||"—")],
+  ["Результат",state.resultStatus||"—"],
+  ["Динамика",state.conditionEffect||"—"],
+  ["Перенос способа действия",state.transferResult||"—"],
+  ["Следующий шаг",join(state.nextDecisions,state.nextOther)||"—"]
+ ];
+}
+function cardExportData(){
+ return [
+  ["Класс",state.classLevel||"—"],["Направление / предмет",state.direction||"—"],["Код обучающегося",state.studentCode||"—"],
+  ...mapExportData(),
+  ["Что выполнено самостоятельно",state.independentlyDone||"—"],
+  ["Где проявилось затруднение",state.difficultyStage||"—"],
+  ["Фактически потребовавшаяся поддержка",state.supportNeeded||"—"],
+  ["Доступность взаимодействия",state.interactionAccessible||"—"],
+  ["Доступность ответа",state.answerAccessible||"—"],
+  ["Соответствие темпа",state.paceFit||"—"],
+  ["Роль ресурса",state.resourceHelp||"—"]
+ ];
+}
+function wrapCanvasText(ctx,text,maxWidth){
+ const words=String(text).split(/\s+/),lines=[];let line="";
+ for(const w of words){
+   const test=line?line+" "+w:w;
+   if(ctx.measureText(test).width>maxWidth && line){lines.push(line);line=w}else line=test;
+ }
+ if(line)lines.push(line);
+ return lines.length?lines:["—"];
+}
+function exportPNG(mode){
+ const data=mode==="map"?mapExportData():cardExportData();
+ const W=1600,pad=90,labelW=420,contentW=W-pad*2-labelW-35;
+ const canvas=document.createElement("canvas"),ctx=canvas.getContext("2d");
+ ctx.font="30px Arial, sans-serif";
+ const rows=data.map(([k,v])=>{
+   ctx.font="30px Arial, sans-serif";
+   const lines=wrapCanvasText(ctx,v,contentW);
+   return {k,v,lines,h:Math.max(96,44+lines.length*39)};
+ });
+ const H=180+rows.reduce((s,r)=>s+r.h,0)+80;
+ canvas.width=W;canvas.height=H;
+ ctx.fillStyle="#ffffff";ctx.fillRect(0,0,W,H);
+ ctx.fillStyle="#17323c";ctx.font="bold 48px Arial, sans-serif";
+ ctx.fillText(mode==="map"?"Карта индивидуального образовательного маршрута":"Итоговая карточка рабочего цикла ИОМ",pad,78);
+ ctx.fillStyle="#526370";ctx.font="25px Arial, sans-serif";
+ ctx.fillText("ИОМ-Навигатор • локальная выгрузка",pad,122);
+ let y=165;
+ rows.forEach((r,i)=>{
+   ctx.fillStyle=i%2===0?"#f6f9fa":"#ffffff";ctx.fillRect(pad,y,W-pad*2,r.h);
+   ctx.strokeStyle="#d8e2e6";ctx.strokeRect(pad,y,W-pad*2,r.h);
+   ctx.fillStyle="#1f4f59";ctx.font="bold 27px Arial, sans-serif";
+   const kl=wrapCanvasText(ctx,r.k,labelW-30);kl.slice(0,3).forEach((line,j)=>ctx.fillText(line,pad+18,y+38+j*33));
+   ctx.fillStyle="#14202b";ctx.font="30px Arial, sans-serif";
+   r.lines.forEach((line,j)=>ctx.fillText(line,pad+labelW+35,y+40+j*39));
+   y+=r.h;
+ });
+ canvas.toBlob(blob=>{
+   if(!blob){alert("Не удалось создать PNG.");return;}
+   downloadBlob(blob,exportBaseName(mode)+".png");
+   closeModal("exportModal");showToast("PNG подготовлен для сохранения.");
+ },"image/png");
+}
+function escapeDoc(s){return escapeHTML(String(s||"—"))}
+function exportWord(mode){
+ const data=mode==="map"?mapExportData():cardExportData();
+ const title=mode==="map"?"Карта индивидуального образовательного маршрута":"Итоговая карточка рабочего цикла ИОМ";
+ const rows=data.map(([k,v])=>`<tr><th>${escapeDoc(k)}</th><td>${escapeDoc(v)}</td></tr>`).join("");
+ const html=`<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;font-size:12pt;color:#17242b}h1{font-size:18pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #9aa9b0;padding:8px;vertical-align:top}th{width:30%;background:#eef4f5;text-align:left}</style></head><body><h1>${title}</h1><p>Сформировано в ИОМ-Навигаторе.</p><table>${rows}</table></body></html>`;
+ downloadBlob(new Blob(["\ufeff",html],{type:"application/msword;charset=utf-8"}),exportBaseName(mode)+".doc");
+ closeModal("exportModal");showToast("Документ Word подготовлен.");
+}
+function printExport(mode){
+ const data=mode==="map"?mapExportData():cardExportData();
+ const title=mode==="map"?"Карта индивидуального образовательного маршрута":"Итоговая карточка рабочего цикла ИОМ";
+ const rows=data.map(([k,v])=>`<tr><th>${escapeDoc(k)}</th><td>${escapeDoc(v)}</td></tr>`).join("");
+ const w=window.open("","_blank");
+ if(!w){alert("Браузер заблокировал окно печати. Разрешите всплывающие окна для этого файла.");return;}
+ w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title><style>@page{size:A4;margin:14mm}body{font-family:Arial,sans-serif;color:#17242b;font-size:10.5pt}h1{font-size:17pt;margin:0 0 5mm}p.note{color:#526370}table{border-collapse:collapse;width:100%}th,td{border:1px solid #aab7bd;padding:6px 7px;vertical-align:top}th{width:31%;background:#eef4f5;text-align:left} @media print{button{display:none}}</style></head><body><h1>${title}</h1><p class="note">ИОМ-Навигатор</p><table>${rows}</table><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+ w.document.close();
+ closeModal("exportModal");
+}
+
+$("#saveCycleBtn").onclick=()=>saveCycle(false);
+$("#saveAsNewBtn").onclick=()=>saveCycle(true);
+
+$("#exportMapBtn").onclick=()=>openExport("map");
+$("#exportCardBtn").onclick=()=>openExport("card");
+$("#printCardBtn").onclick=()=>printExport("card");
+$$("[data-export-format]").forEach(b=>b.onclick=()=>{
+ const f=b.dataset.exportFormat;
+ if(f==="png")exportPNG(exportMode);
+ if(f==="word")exportWord(exportMode);
+ if(f==="pdf"||f==="print")printExport(exportMode);
+});
+
+$("#editCycleBtn").onclick=()=>{currentStep=0;renderStep()};
+$("#newCycleBtn").onclick=nextCycle;
+$("#printBtn").onclick=()=>window.print();
+$("#wordBtn").onclick=exportWord;
+$("#cycleSearch").oninput=renderCycleDashboard;
+$("#backupBtn").onclick=exportBackup;
+$("#restoreBtn").onclick=()=>$("#restoreInput").click();
+$("#restoreInput").onchange=e=>{const f=e.target.files?.[0];if(f)importBackup(f);e.target.value=""};
+$("#clearLocalBtn").onclick=()=>{
+ if(!confirm("Удалить черновик, сохранённые циклы и настройки ИОМ-Навигатора из этого браузера? Это действие нельзя отменить без резервной копии."))return;
+ ["iom_draft","iom_cycles","iom_current_step","iom_font_level","iom_tour_seen"].forEach(k=>localStorage.removeItem(k));
+ state=clone(emptyState);currentStep=0;fontLevel=0;applyFont();renderCycleDashboard();closeModal("cyclesModal");showHome();showToast("Локальные данные приложения удалены.");
+};
+["libSearch","libClass","libSubject","libNeed"].forEach(id=>{$("#"+id).addEventListener(id==="libSearch"?"input":"change",renderLibrary)});
+$$("[data-close]").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+$$(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)closeModal(m.id)}));
+$$(".quick-card").forEach(b=>b.onclick=()=>{const a=b.dataset.action;if(a==="start")startNew(true);if(a==="cycles")openCycles();if(a==="library"){renderLibrary();openModal("libraryModal")}});
+
+$("#tourPrev").onclick=()=>{tourIndex=Math.max(0,tourIndex-1);renderTour()};
+$("#tourNext").onclick=()=>{if(tourIndex<3){tourIndex++;renderTour()}else{localStorage.setItem("iom_tour_seen","1");closeModal("tourModal");startNew(true)}};
+function renderTour(){
+ $$(".tour-slide").forEach((s,i)=>s.classList.toggle("active",i===tourIndex));
+ $("#tourPrev").style.visibility=tourIndex===0?"hidden":"visible";
+ $("#tourNext").textContent=tourIndex===3?"НАЧАТЬ РАБОТУ":"Далее";
+}
+renderLibrary();renderGlossary();applyFont();
+(function(){
+ const d=loadDraft();
+ const meaningful=d && (d.iomTask || d.classLevel || (d.needs&&d.needs.length) || (d.actionSteps&&d.actionSteps.some(Boolean)));
+ const c=$("#continueBtn");
+ if(c && !meaningful){c.disabled=true;c.title="Сохранённого черновика пока нет";c.style.opacity=".55";c.style.cursor="not-allowed"}
+})();
+if(!localStorage.getItem("iom_tour_seen")){openModal("tourModal");renderTour()}
+</script>
+</body>
+</html>
